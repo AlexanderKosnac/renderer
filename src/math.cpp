@@ -2,7 +2,11 @@
 
 namespace math {
 
+    vec3::vec3() : x(0.0f), y(0.0f), z(0.0f) {}
+
     vec3::vec3(float xx, float yy, float zz) : x(xx), y(yy), z(zz) {}
+
+    vec4::vec4() : x(0.0f), y(0.0f), z(0.0f), w(0.0f) {}
 
     vec4::vec4(float xx, float yy, float zz, float ww) : x(xx), y(yy), z(zz), w(ww) {}
 

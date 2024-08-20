@@ -2,12 +2,14 @@ namespace math {
     struct vec3 {
         float x, y, z;
 
+        vec3();
         vec3(float xx, float yy, float zz);
     };
 
     struct vec4 {
         float x, y, z, w;
 
+        vec4();
         vec4(float xx, float yy, float zz, float ww);
     };
 
