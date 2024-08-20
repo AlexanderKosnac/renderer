@@ -1,3 +1,6 @@
+#ifndef MATH
+#define MATH
+
 namespace math {
     struct vec3 {
         float x, y, z;
@@ -30,3 +33,5 @@ namespace math {
     mat3x3 multMat3x3OnMat3x3(mat3x3 matA, mat3x3 matB);
     mat4x4 multMat4x4OnMat4x4(mat4x4 matA, mat4x4 matB);
 }
+
+#endif
