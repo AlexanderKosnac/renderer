@@ -10,10 +10,10 @@ CFLAGS += -g -O3 -DLINUX  #-Wall
 LFLAGS += -L/usr/X11R6/lib -lX11
 INCLUDES  =  -I. -Iinclude -Iglm -I/usr/X11R6/include
 
-OBJS = src/main.o src/math.o src/modelling/triangle.o src/modelling/mesh.o
+OBJS = src/main.o src/math.o src/modelling/triangle.o src/modelling/mesh.o src/display/x11display.o
 
-$(EXEC): $(OBJS) 
-	$(CXX) -o $(EXEC) $(OBJS) $(CFLAGS) $(LIBS) $(LFLAGS) 
+$(EXEC): $(OBJS)
+	$(CXX) -o $(EXEC) $(OBJS) $(CFLAGS) $(LIBS) $(LFLAGS)
 
 all: $(OBJS)
 
