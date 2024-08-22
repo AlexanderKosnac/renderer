@@ -28,6 +28,8 @@ namespace math {
         mat4x4(vec4 aa, vec4 bb, vec4 cc, vec4 dd);
     };
 
+    float crossVec3(vec3 vecA, vec3 vecB);
+
     vec3 multMat3x3OnVec3(mat3x3 mat, vec3 vec);
     vec4 multMat4x4OnVec4(mat4x4 mat, vec4 vec);
     mat3x3 multMat3x3OnMat3x3(mat3x3 matA, mat3x3 matB);

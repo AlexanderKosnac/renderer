@@ -14,6 +14,10 @@ namespace math {
 
     mat4x4::mat4x4(vec4 aa, vec4 bb, vec4 cc, vec4 dd) : a(aa), b(bb), c(cc), d(dd) {}
 
+    float crossVec3(vec3 vecA, vec3 vecB) {
+        return vecA.x * vecB.x + vecA.y * vecB.y + vecA.z * vecB.z;
+    }
+
     vec3 multMat3x3OnVec3(mat3x3 mat, vec3 vec) {
         return vec3(
             mat.a.x * vec.x + mat.b.x * vec.y + mat.c.x * vec.z,
@@ -47,4 +51,4 @@ namespace math {
             multMat4x4OnVec4(matA, vec4(matB.a.w, matB.b.w, matB.c.w, matB.d.w))
         );
     }
-} // namespace math
+}
