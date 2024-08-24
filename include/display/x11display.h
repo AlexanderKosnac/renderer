@@ -15,6 +15,8 @@ private:
     Window window;
     int screen;
 
+    int width;
+    int height;
     std::map<CallbackType, std::vector<std::function<void(XEvent&)>>> listeners;
 
 public:

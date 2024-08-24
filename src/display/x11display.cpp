@@ -3,6 +3,7 @@
 #include <iostream>
 #include <map>
 #include <list>
+#include <cstdlib>
 
 #include "math.h"
 #include "display/x11display.h"
@@ -17,7 +18,9 @@ std::map<int, CallbackType> eventMapping = {
     {MotionNotify, MOUSE_MOTION},
 };
 
-DisplayX11::DisplayX11(int width, int height) {
+DisplayX11::DisplayX11(int pWidth, int pHeight) {
+    width = pWidth;
+    height = pHeight;
     display = XOpenDisplay(nullptr);
     if (display == nullptr) {
         std::cerr << "Unable to open X display" << std::endl;
@@ -25,7 +28,7 @@ DisplayX11::DisplayX11(int width, int height) {
     }
 
     screen = DefaultScreen(display);
-    window = XCreateSimpleWindow(display, RootWindow(display, screen), 0, 0, 500, 500, 1, WhitePixel(display, screen), BlackPixel(display, screen));
+    window = XCreateSimpleWindow(display, RootWindow(display, screen), 0, 0, width, height, 1, WhitePixel(display, screen), BlackPixel(display, screen));
 
     XSelectInput(display, window, KeyPressMask | KeyReleaseMask | PointerMotionMask | ButtonPressMask | ButtonReleaseMask | ExposureMask);
     XMapWindow(display, window);
