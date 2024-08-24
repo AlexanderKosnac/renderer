@@ -1,5 +1,7 @@
 #include "math.h"
 
+#include <cmath>
+
 namespace math {
 
     vec3::vec3() : x(0.0f), y(0.0f), z(0.0f) {}
@@ -20,6 +22,11 @@ namespace math {
             vecA.z * vecB.x - vecA.x * vecB.z,
             vecA.x * vecB.y - vecA.y * vecB.x
         );
+    }
+
+    vec3 normVec3(vec3 vec) {
+        float length = std::sqrt(vec.x*vec.x + vec.y*vec.y + vec.z*vec.z);
+        return (length > 0.0f) ? vec3(vec.x/length, vec.y/length, vec.z/length) : vec3(0.0f, 0.0f, 0.0f);
     }
 
     vec3 multMat3x3OnVec3(mat3x3 mat, vec3 vec) {

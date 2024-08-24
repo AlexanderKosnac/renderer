@@ -29,6 +29,7 @@ namespace math {
     };
 
     vec3 crossVec3(vec3 vecA, vec3 vecB);
+    vec3 normVec3(vec3 vec);
 
     vec3 multMat3x3OnVec3(mat3x3 mat, vec3 vec);
     vec4 multMat4x4OnVec4(mat4x4 mat, vec4 vec);
