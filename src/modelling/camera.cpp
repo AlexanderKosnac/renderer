@@ -17,4 +17,19 @@ namespace modelling {
         w = lookat;
     }
 
+    math::vec3& Camera::getPos() {
+        return pos;
+    }
+
+    math::vec3 Camera::normedU() {
+        return math::normVec3(u);
+    }
+
+    math::vec3 Camera::normedV() {
+        return math::normVec3(v);
+    }
+
+    math::vec3 Camera::normedW() {
+        return math::normVec3(w);
+    }
 }

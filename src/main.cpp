@@ -2,20 +2,49 @@
 #include <iostream>
 
 #include "math.h"
-#include "modelling/mesh.h"
 #include "modelling/triangle.h"
+#include "modelling/mesh.h"
+#include "modelling/camera.h"
 #include "display/x11display.h"
 #include "display/callbacktypes.h"
 
 int main() {
+    modelling::Camera camera(60.0f, 3.0f, 0.1f, 100.0f, math::vec3(0.0f, 0.0f, 0.0f), math::vec3(0.0f, 1.0f, 0.0f), math::vec3(0.0f, 0.0f, 1.0f));
     int a = 5;
 
     auto onExpose = [a](XEvent& event) mutable {
         std::cout << "Expose" << std::endl;
     };
 
-    auto onKeyPress = [a](XEvent& event) mutable {
-        std::cout << "Key pressed: " << XLookupKeysym(&event.xkey, 0) << std::endl;
+    auto onKeyPress = [camera](XEvent& event) mutable {
+        math::vec3& pos = camera.getPos();
+        math::vec3 axis;
+        switch (event.xkey.keycode) {
+            case 25: // W
+                axis = camera.normedW();
+                pos.x += axis.x;
+                pos.y += axis.y;
+                pos.z += axis.z;
+                break;
+            case 38: // A
+                axis = camera.normedU();
+                pos.x -= axis.x;
+                pos.y -= axis.y;
+                pos.z -= axis.z;
+                break;
+            case 39: // S
+                axis = camera.normedW();
+                pos.x -= axis.x;
+                pos.y -= axis.y;
+                pos.z -= axis.z;
+                break;
+            case 40: // D
+                axis = camera.normedU();
+                pos.x += axis.x;
+                pos.y += axis.y;
+                pos.z += axis.z;
+                break;
+        }
     };
 
     auto onKeyRelease = [a](XEvent& event) mutable {
@@ -34,7 +63,7 @@ int main() {
         std::cout << "Mouse Moved to (" << event.xmotion.x << ", " << event.xmotion.y << ")" << std::endl;
     };
 
-    DisplayX11 display(500, 500);
+    DisplayX11 display(1024, 512);
     display.addListener(EXPOSE, onExpose);
     display.addListener(KEY_PRESS, onKeyPress);
     display.addListener(KEY_RELEASE, onKeyRelease);
