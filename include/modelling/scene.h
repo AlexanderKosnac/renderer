@@ -19,6 +19,7 @@ public:
     void addMesh(modelling::Mesh& mesh);
 
     const std::vector<modelling::Mesh>& getMeshes();
+    modelling::Camera& getCamera();
 };
 
 #endif

@@ -11,7 +11,7 @@
 #include "display/callbacktypes.h"
 
 int main() {
-    modelling::Camera camera(60.0f, 3.0f, 0.1f, 100.0f, math::vec3(0.0f, 0.0f, 0.0f), math::vec3(0.0f, 1.0f, 0.0f), math::vec3(0.0f, 0.0f, 1.0f));
+    modelling::Camera cam(60.0f, 3.0f, 0.1f, 100.0f, math::vec3(0.0f, 0.0f, 0.0f), math::vec3(0.0f, 1.0f, 0.0f), math::vec3(0.0f, 0.0f, 1.0f));
 
     modelling::Triangle t1;
     t1.setVertex(0, math::vec3(0.0f, 0.0f, 0.0f), math::vec3(255.0f, 255.0f, 255.0f));
@@ -21,16 +21,16 @@ int main() {
     modelling::Mesh mesh;
     mesh.addTriangle(t1);
 
-    Scene scene(camera);
+    Scene scene(cam);
     scene.addMesh(mesh);
 
-    int a = 5;
+    modelling::Camera& camera = scene.getCamera();
 
-    auto onExpose = [a](XEvent& event) mutable {
+    auto onExpose = [&camera](XEvent& event) mutable {
         std::cout << "Expose" << std::endl;
     };
 
-    auto onKeyPress = [camera](XEvent& event) mutable {
+    auto onKeyPress = [&camera](XEvent& event) mutable {
         math::vec3& pos = camera.getPos();
         math::vec3 axis;
         switch (event.xkey.keycode) {
@@ -61,23 +61,23 @@ int main() {
         }
     };
 
-    auto onKeyRelease = [a](XEvent& event) mutable {
+    auto onKeyRelease = [&camera](XEvent& event) mutable {
         std::cout << "Key released: " << XLookupKeysym(&event.xkey, 0) << std::endl;
     };
 
-    auto onButtonPress = [a](XEvent& event) mutable {
+    auto onButtonPress = [&camera](XEvent& event) mutable {
         std::cout << "Mouse Button " << event.xbutton.button << " Pressed at (" << event.xbutton.x  << ", " << event.xbutton.y << ")" << std::endl;
     };
 
-    auto onButtonRelease = [a](XEvent& event) mutable {
+    auto onButtonRelease = [&camera](XEvent& event) mutable {
         std::cout << "Mouse Button " << event.xbutton.button << " Released at (" << event.xbutton.x << ", " << event.xbutton.y << ")" << std::endl;
     };
 
-    auto onMouseMotion = [a](XEvent& event) mutable {
+    auto onMouseMotion = [&camera](XEvent& event) mutable {
         std::cout << "Mouse Moved to (" << event.xmotion.x << ", " << event.xmotion.y << ")" << std::endl;
     };
 
-    DisplayX11 display(1024, 768);
+    DisplayX11 display(480, 360);
     display.addListener(EXPOSE, onExpose);
     display.addListener(KEY_PRESS, onKeyPress);
     display.addListener(KEY_RELEASE, onKeyRelease);

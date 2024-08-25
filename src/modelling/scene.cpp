@@ -9,3 +9,7 @@ void Scene::addMesh(modelling::Mesh& mesh) {
 const std::vector<modelling::Mesh>& Scene::getMeshes() {
     return meshes;
 }
+
+modelling::Camera& Scene::getCamera() {
+    return camera;
+}
