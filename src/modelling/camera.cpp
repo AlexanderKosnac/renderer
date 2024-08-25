@@ -1,6 +1,8 @@
 #include "math.h"
 #include "modelling/camera.h"
 
+#include "math.h"
+
 namespace modelling {
 
     Camera::Camera(float pFov, float pAspect, float pNear, float pFar, math::vec3 pPos, math::vec3 pUp, math::vec3 pLookat) {
@@ -15,6 +17,10 @@ namespace modelling {
         u = math::crossVec3(up, lookat);
         v = math::crossVec3(lookat, u);
         w = lookat;
+    }
+
+    math::mat3x3 Camera::getCameraTransformation() {
+        return math::mat3x3(pos, lookat, up);
     }
 
     math::vec3& Camera::getPos() {
