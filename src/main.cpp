@@ -5,11 +5,24 @@
 #include "modelling/triangle.h"
 #include "modelling/mesh.h"
 #include "modelling/camera.h"
+#include "modelling/scene.h"
 #include "display/x11display.h"
 #include "display/callbacktypes.h"
 
 int main() {
     modelling::Camera camera(60.0f, 3.0f, 0.1f, 100.0f, math::vec3(0.0f, 0.0f, 0.0f), math::vec3(0.0f, 1.0f, 0.0f), math::vec3(0.0f, 0.0f, 1.0f));
+
+    modelling::Triangle t1;
+    t1.setVertex(0, math::vec3(0.0f, 0.0f, 0.0f), math::vec3(255.0f, 255.0f, 255.0f));
+    t1.setVertex(1, math::vec3(0.0f, 1.0f, 0.0f), math::vec3(255.0f, 255.0f, 255.0f));
+    t1.setVertex(2, math::vec3(0.0f, 0.0f, 1.0f), math::vec3(255.0f, 255.0f, 255.0f));
+
+    modelling::Mesh mesh;
+    mesh.addTriangle(t1);
+
+    Scene scene(camera);
+    scene.addMesh(mesh);
+
     int a = 5;
 
     auto onExpose = [a](XEvent& event) mutable {
