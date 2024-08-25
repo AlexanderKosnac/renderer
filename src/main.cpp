@@ -6,6 +6,7 @@
 #include "modelling/mesh.h"
 #include "modelling/camera.h"
 #include "modelling/scene.h"
+#include "rasterizer/rasterizer.h"
 #include "display/x11display.h"
 #include "display/callbacktypes.h"
 
@@ -76,7 +77,7 @@ int main() {
         std::cout << "Mouse Moved to (" << event.xmotion.x << ", " << event.xmotion.y << ")" << std::endl;
     };
 
-    DisplayX11 display(1024, 512);
+    DisplayX11 display(1024, 768);
     display.addListener(EXPOSE, onExpose);
     display.addListener(KEY_PRESS, onKeyPress);
     display.addListener(KEY_RELEASE, onKeyRelease);
@@ -84,9 +85,12 @@ int main() {
     display.addListener(BUTTON_RELEASE, onButtonRelease);
     display.addListener(MOUSE_MOTION, onMouseMotion);
 
+    Rasterizer renderer(display, scene);
+
     bool running = true;
     while (running) {
         std::cout << "tick" << std::endl;
+        renderer.render();
         display.update();
     }
 }
