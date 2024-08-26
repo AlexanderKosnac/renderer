@@ -2,6 +2,9 @@
 #define MATH
 
 namespace math {
+
+    float asRadians(float degrees);
+
     struct vec3 {
         float x, y, z;
 

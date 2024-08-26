@@ -4,6 +4,12 @@
 
 namespace math {
 
+    const float PI = 3.141592654;
+
+    float asRadians(float degrees) {
+        return degrees*PI/180;
+    }
+
     vec3::vec3() : x(0.0f), y(0.0f), z(0.0f) {}
 
     vec3::vec3(float xx, float yy, float zz) : x(xx), y(yy), z(zz) {}
