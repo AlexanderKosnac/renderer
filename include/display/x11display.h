@@ -26,6 +26,9 @@ public:
 
     void addListener(CallbackType type, std::function<void(XEvent&)> callbackFn);
 
+    float getWidth();
+    float getHeight();
+
     void handleEvent(XEvent &event);
     void update();
 };

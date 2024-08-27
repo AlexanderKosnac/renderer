@@ -42,6 +42,14 @@ void DisplayX11::addListener(CallbackType type, std::function<void(XEvent&)> cal
     listeners[type].push_back(callbackFn);
 }
 
+float DisplayX11::getWidth() {
+    return width;
+}
+
+float DisplayX11::getHeight() {
+    return height;
+}
+
 void DisplayX11::handleEvent(XEvent& event) {
     CallbackType cbt = eventMapping[event.type];
     if (!cbt) {
