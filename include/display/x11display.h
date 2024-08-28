@@ -17,6 +17,8 @@ private:
 
     int width;
     int height;
+    unsigned char* image;
+
     std::map<CallbackType, std::vector<std::function<void(XEvent&)>>> listeners;
 
 public:
@@ -31,6 +33,7 @@ public:
 
     void handleEvent(XEvent &event);
     void update();
+    void setPixel(int x, int y, math::vec3& color);
 };
 
 #endif

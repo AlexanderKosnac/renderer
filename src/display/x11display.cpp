@@ -21,6 +21,8 @@ std::map<int, CallbackType> eventMapping = {
 DisplayX11::DisplayX11(int pWidth, int pHeight) {
     width = pWidth;
     height = pHeight;
+    image = new unsigned char[width*height*4];
+
     display = XOpenDisplay(nullptr);
     if (display == nullptr) {
         std::cerr << "Unable to open X display" << std::endl;
@@ -62,7 +64,22 @@ void DisplayX11::handleEvent(XEvent& event) {
 }
 
 void DisplayX11::update() {
+    const int depth = 24;
+    const int pad = 32;
+
+    XImage* ximg = XCreateImage(display, DefaultVisual(display, screen), depth, ZPixmap, 0, reinterpret_cast<char*>(image), width, height, pad, 0);
+    XPutImage(display, window, DefaultGC(display, screen), ximg, 0, 0, 0, 0, width, height);
+
     XEvent event;
     XNextEvent(display, &event);
     handleEvent(event);
+}
+
+void DisplayX11::setPixel(int x, int y, math::vec3& color) {
+    if (x < 0 || y < 0 || x >= width || y >= height) return;
+    int i = (y * width + x) * 4;
+    image[i+0] = color.x;
+    image[i+1] = color.y;
+    image[i+2] = color.z;
+    image[i+3] = 255;
 }
