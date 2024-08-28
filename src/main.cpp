@@ -33,32 +33,26 @@ int main() {
     auto onKeyPress = [&camera](XEvent& event) mutable {
         math::vec3& pos = camera.getPos();
         math::vec3 axis;
+        bool sub = false;
         switch (event.xkey.keycode) {
             case 25: // W
                 axis = camera.normedW();
-                pos.x += axis.x;
-                pos.y += axis.y;
-                pos.z += axis.z;
                 break;
             case 38: // A
                 axis = camera.normedU();
-                pos.x -= axis.x;
-                pos.y -= axis.y;
-                pos.z -= axis.z;
+                sub = true;
                 break;
             case 39: // S
                 axis = camera.normedW();
-                pos.x -= axis.x;
-                pos.y -= axis.y;
-                pos.z -= axis.z;
+                sub = true;
                 break;
             case 40: // D
                 axis = camera.normedU();
-                pos.x += axis.x;
-                pos.y += axis.y;
-                pos.z += axis.z;
                 break;
         }
+        sub ? pos.x -= axis.x : pos.x += axis.x;
+        sub ? pos.y -= axis.y : pos.y += axis.y;
+        sub ? pos.z -= axis.z : pos.z += axis.z;
     };
 
     auto onKeyRelease = [&camera](XEvent& event) mutable {
