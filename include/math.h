@@ -5,11 +5,15 @@ namespace math {
 
     float asRadians(float degrees);
 
+    struct vec4; // Forward declaration of vec4
+
     struct vec3 {
         float x, y, z;
 
         vec3();
         vec3(float xx, float yy, float zz);
+
+        vec4 toVec4(float ww);
     };
 
     struct vec4 {
@@ -17,6 +21,9 @@ namespace math {
 
         vec4();
         vec4(float xx, float yy, float zz, float ww);
+
+        vec3 toVec3();
+        vec3 dehomogenize();
     };
 
     struct mat3x3 {

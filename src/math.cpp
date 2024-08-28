@@ -14,9 +14,21 @@ namespace math {
 
     vec3::vec3(float xx, float yy, float zz) : x(xx), y(yy), z(zz) {}
 
+    vec4 vec3::toVec4(float ww) {
+        return vec4(x, y, z, ww);
+    }
+
     vec4::vec4() : x(0.0f), y(0.0f), z(0.0f), w(0.0f) {}
 
     vec4::vec4(float xx, float yy, float zz, float ww) : x(xx), y(yy), z(zz), w(ww) {}
+
+    vec3 vec4::toVec3() {
+        return vec3(x, y, z);
+    }
+
+    vec3 vec4::dehomogenize() {
+        return (w == 0.0f) ? vec3(x, y, z) : vec3(x/w, y/w, z/w);
+    }
 
     mat3x3::mat3x3(vec3 aa, vec3 bb, vec3 cc) : a(aa), b(bb), c(cc) {}
 
