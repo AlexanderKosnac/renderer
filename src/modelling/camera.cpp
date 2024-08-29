@@ -24,19 +24,14 @@ namespace modelling {
         return math::mat3x3(pos, lookat, up);
     }
 
-    math::mat4x4 Camera::getProjectionMatrix() {
-        float range = tan(math::asRadians(fov/2.0)) * near;
-        float left = -range * aspect;
-        float right = range * aspect;
-        float bottom = -range;
-        float top = range;
+    void Camera::setProjectionMatrix(math::mat4x4& target) {
+        float fovRads = math::asRadians(fov);
 
-        return math::mat4x4(
-            math::vec4((2.0*near)/(right-left), 0.0, 0.0, 0.0),
-            math::vec4(0.0, (2.0*near)/(top-bottom), 0.0, 0.0),
-            math::vec4(0.0, 0.0, -(far+near)/(far-near), -(2.0*far*near)/(far-near)),
-            math::vec4(0.0, 0.0, -1.0, 0.0)
-        );
+        target.a.x = aspect*fovRads;
+        target.b.y = fovRads;
+        target.c.z = far/(far-near);
+        target.c.w = 1.0f;
+        target.d.z = (-far*near)/(far-near);
     }
 
     math::vec3& Camera::getPos() {
