@@ -83,3 +83,10 @@ void DisplayX11::setPixel(int x, int y, math::vec3& color) {
     image[i+2] = color.z;
     image[i+3] = 255;
 }
+
+void DisplayX11::clear() {
+    const int m = width*height*4;
+    for (int i=0; i<m; ++i) {
+        image[i] = 0;
+    }
+}

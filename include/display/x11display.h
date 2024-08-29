@@ -34,6 +34,7 @@ public:
     void handleEvent(XEvent &event);
     void update();
     void setPixel(int x, int y, math::vec3& color);
+    void clear();
 };
 
 #endif
