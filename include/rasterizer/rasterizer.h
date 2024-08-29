@@ -19,7 +19,7 @@ public:
 
     void updateProjectionMatrix();
 
-    void drawLine(float x1, float y1, float x2, float y2);
+    void drawLine(float x1, float y1, math::vec3& color1, float x2, float y2, math::vec3& color2);
     void drawTriangle(modelling::Triangle& t);
 };
 

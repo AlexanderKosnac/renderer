@@ -80,4 +80,13 @@ namespace math {
             multMat4x4OnVec4(matA, vec4(matB.a.w, matB.b.w, matB.c.w, matB.d.w))
         );
     }
+
+    math::vec3 linInterpolVec3(float t, math::vec3& vecA, math::vec3& vecB) {
+        float ti = 1 - t;
+        return math::vec3(
+            vecA.x * t + vecB.x * ti,
+            vecA.y * t + vecB.y * ti,
+            vecA.z * t + vecB.z * ti
+        );
+    }
 }

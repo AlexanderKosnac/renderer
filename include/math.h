@@ -45,6 +45,8 @@ namespace math {
     vec4 multMat4x4OnVec4(mat4x4 mat, vec4 vec);
     mat3x3 multMat3x3OnMat3x3(mat3x3 matA, mat3x3 matB);
     mat4x4 multMat4x4OnMat4x4(mat4x4 matA, mat4x4 matB);
+
+    vec3 linInterpolVec3(float t, vec3& vecA, vec3& vecB);
 }
 
 #endif

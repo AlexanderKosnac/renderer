@@ -78,9 +78,9 @@ void DisplayX11::update() {
 void DisplayX11::setPixel(int x, int y, math::vec3& color) {
     if (x < 0 || y < 0 || x >= width || y >= height) return;
     int i = (y * width + x) * 4;
-    image[i+0] = color.x;
+    image[i+0] = color.z;
     image[i+1] = color.y;
-    image[i+2] = color.z;
+    image[i+2] = color.x;
     image[i+3] = 255;
 }
 
