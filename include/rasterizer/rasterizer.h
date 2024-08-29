@@ -18,6 +18,9 @@ public:
     void render();
 
     void updateProjectionMatrix();
+
+    void drawLine(float x1, float y1, float x2, float y2);
+    void drawTriangle(modelling::Triangle& t);
 };
 
 #endif
