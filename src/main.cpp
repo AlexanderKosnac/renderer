@@ -11,15 +11,101 @@
 #include "display/callbacktypes.h"
 
 int main() {
-    modelling::Camera cam(60.0f, 3.0f, 0.1f, 100.0f, math::vec3(0.0f, 0.0f, 0.0f), math::vec3(0.0f, 1.0f, 0.0f), math::vec3(0.0f, 0.0f, 1.0f));
+    modelling::Camera cam(90.0f, .75f, 0.1f, 1000.0f, math::vec3(0.0f, 0.0f, 0.0f), math::vec3(0.0f, 1.0f, 0.0f), math::vec3(0.0f, 0.0f, 1.0f));
 
-    modelling::Triangle t1;
-    t1.setVertex(0, math::vec3(0.0f, 0.0f, 0.0f), math::vec3(255.0f, 255.0f, 255.0f));
-    t1.setVertex(1, math::vec3(0.0f, 1.0f, 0.0f), math::vec3(255.0f, 255.0f, 255.0f));
-    t1.setVertex(2, math::vec3(0.0f, 0.0f, 1.0f), math::vec3(255.0f, 255.0f, 255.0f));
+    // Origin Cube
+    // - Vertices
+    math::vec3 v0 = math::vec3(0.0f, 0.0f, 0.0f);
+    math::vec3 v1 = math::vec3(0.0f, 1.0f, 0.0f);
+    math::vec3 v2 = math::vec3(1.0f, 0.0f, 0.0f);
+    math::vec3 v3 = math::vec3(1.0f, 1.0f, 0.0f);
+    math::vec3 v4 = math::vec3(0.0f, 0.0f, 1.0f);
+    math::vec3 v5 = math::vec3(0.0f, 1.0f, 1.0f);
+    math::vec3 v6 = math::vec3(1.0f, 0.0f, 1.0f);
+    math::vec3 v7 = math::vec3(1.0f, 1.0f, 1.0f);
+    // - Colors
+    math::vec3 c0 = math::vec3(255.0f, 0.0f, 0.0f);
+    math::vec3 c1 = math::vec3(255.0f, 0.0f, 0.0f);
+    math::vec3 c2 = math::vec3(255.0f, 0.0f, 0.0f);
+    math::vec3 c3 = math::vec3(255.0f, 0.0f, 0.0f);
+    math::vec3 c4 = math::vec3(255.0f, 0.0f, 0.0f);
+    math::vec3 c5 = math::vec3(255.0f, 0.0f, 0.0f);
+    math::vec3 c6 = math::vec3(255.0f, 0.0f, 0.0f);
+    math::vec3 c7 = math::vec3(255.0f, 0.0f, 0.0f);
+    // - Faces
+    modelling::Triangle f0;
+    f0.setVertex(0, v0, c0);
+    f0.setVertex(1, v2, c2);
+    f0.setVertex(2, v3, c3);
+
+    modelling::Triangle f1;
+    f1.setVertex(0, v0, c0);
+    f1.setVertex(1, v3, c3);
+    f1.setVertex(2, v1, c1);
+
+    modelling::Triangle f2;
+    f2.setVertex(0, v1, c1);
+    f2.setVertex(1, v3, c3);
+    f2.setVertex(2, v7, c7);
+
+    modelling::Triangle f3;
+    f3.setVertex(0, v1, c1);
+    f3.setVertex(1, v7, c7);
+    f3.setVertex(2, v5, c5);
+
+    modelling::Triangle f4;
+    f4.setVertex(0, v0, c0);
+    f4.setVertex(1, v4, c4);
+    f4.setVertex(2, v6, c6);
+
+    modelling::Triangle f5;
+    f5.setVertex(0, v0, c0);
+    f5.setVertex(1, v6, c6);
+    f5.setVertex(2, v2, c2);
+
+    modelling::Triangle f6;
+    f6.setVertex(0, v2, c2);
+    f6.setVertex(1, v6, c6);
+    f6.setVertex(2, v3, c3);
+
+    modelling::Triangle f7;
+    f7.setVertex(0, v3, c3);
+    f7.setVertex(1, v6, c6);
+    f7.setVertex(2, v7, c7);
+
+    modelling::Triangle f8;
+    f8.setVertex(0, v0, c0);
+    f8.setVertex(1, v1, c1);
+    f8.setVertex(2, v4, c4);
+
+    modelling::Triangle f9;
+    f9.setVertex(0, v1, c1);
+    f9.setVertex(1, v5, c5);
+    f9.setVertex(2, v4, c4);
+
+    modelling::Triangle f10;
+    f10.setVertex(0, v5, c5);
+    f10.setVertex(1, v6, c6);
+    f10.setVertex(2, v4, c4);
+
+    modelling::Triangle f11;
+    f11.setVertex(0, v5, c5);
+    f11.setVertex(1, v7, c7);
+    f11.setVertex(2, v6, c6);
 
     modelling::Mesh mesh;
-    mesh.addTriangle(t1);
+    mesh.addTriangle(f0);
+    mesh.addTriangle(f1);
+    mesh.addTriangle(f2);
+    mesh.addTriangle(f3);
+    mesh.addTriangle(f4);
+    mesh.addTriangle(f5);
+    mesh.addTriangle(f6);
+    mesh.addTriangle(f7);
+    mesh.addTriangle(f8);
+    mesh.addTriangle(f9);
+    mesh.addTriangle(f10);
+    mesh.addTriangle(f11);
 
     Scene scene(cam);
     scene.addMesh(mesh);
