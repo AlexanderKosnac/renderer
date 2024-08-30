@@ -20,6 +20,7 @@ void Rasterizer::render() {
                 v.y = (v.y + 1.0f) * height2;
                 projected.setVertex(i, v, triangle.getVertexColor(i));
             }
+            fillTriangle(projected);
             drawTriangle(projected);
         }
     }
@@ -107,4 +108,76 @@ void Rasterizer::drawTriangle(modelling::Triangle& t) {
     drawLine(v0.x, v0.y, t.color[0], v1.x, v1.y, t.color[1]);
     drawLine(v1.x, v1.y, t.color[1], v2.x, v2.y, t.color[2]);
     drawLine(v2.x, v2.y, t.color[2], v0.x, v0.y, t.color[0]);
+}
+
+template <typename T>
+void swap(T& a, T& b) {
+    T temp = a;
+    a = b;
+    b = temp;
+}
+
+void Rasterizer::fillTriangle(modelling::Triangle& t) {
+    const math::vec3* p0 = &t.getVertexPos(0);
+    const math::vec3* p1 = &t.getVertexPos(1);
+    const math::vec3* p2 = &t.getVertexPos(2);
+    const math::vec3* c0 = &t.getVertexColor(0);
+    const math::vec3* c1 = &t.getVertexColor(1);
+    const math::vec3* c2 = &t.getVertexColor(2);
+
+    // Flattened sort
+    if (p1->y < p0->y) { swap(p0, p1); swap(c0, c1); }
+    if (p2->y < p0->y) { swap(p0, p2); swap(c0, c2); }
+    if (p2->y < p1->y) { swap(p1, p2); swap(c1, c2); }
+
+    std::cout << "p0 (" << p0->x << "," << p0->y << "," << p0->z << ") [" << c0->x << "," << c0->y << "," << c0->z << "]" << std::endl;
+    std::cout << "p1 (" << p1->x << "," << p1->y << "," << p1->z << ") [" << c1->x << "," << c1->y << "," << c1->z << "]" << std::endl;
+    std::cout << "p2 (" << p2->x << "," << p2->y << "," << p2->z << ") [" << c2->x << "," << c2->y << "," << c2->z << "]" << std::endl;
+
+    math::vec3 top = *p0, mid = *p1, bot = *p2;
+    math::vec3 topColor = *c0, midColor = *c1, botColor = *c2;
+
+    float invSlope1 = (mid.y-top.y) > 0 ? (mid.x-top.x)/(mid.y-top.y) : 0;
+    float invSlope2 = (bot.y-top.y) > 0 ? (bot.x-top.x)/(bot.y-top.y) : 0;
+    float invSlope3 = (bot.y-mid.y) > 0 ? (bot.x-mid.x)/(bot.y-mid.y) : 0;
+
+    // Draw TOP to MID
+    float xStart = top.x;
+    float xEnd = top.x;
+    for (float y=top.y; y<=mid.y; ++y) {
+        float t1 = (y-top.y)/(mid.y-top.y);
+        float t2 = (y-top.y)/(bot.y-top.y);
+
+        math::vec3 colorStart = math::linInterpolVec3(t1, midColor, topColor);
+        math::vec3 colorEnd = math::linInterpolVec3(t2, botColor, topColor);
+
+        if (xStart > xEnd) { swap(xStart, xEnd); swap(colorStart, colorEnd); }
+        for (int x=static_cast<int>(xStart); x<=static_cast<int>(xEnd); ++x) {
+            float t = (x-xStart)/(xEnd-xStart);
+            math::vec3 c = math::linInterpolVec3(t, colorEnd, colorStart);
+            display.setPixel(x, y, c);
+        }
+        xStart += invSlope1;
+        xEnd += invSlope2;
+    }
+
+    // Draw MID to BOT
+    xStart = mid.x;
+    xEnd = top.x + invSlope2 * (mid.y - top.y);
+    for (int y=static_cast<int>(mid.y); y<=static_cast<int>(bot.y); ++y) {
+        float t1 = (y-mid.y)/(bot.y-mid.y);
+        float t2 = (y-top.y)/(bot.y-top.y);
+
+        math::vec3 colorStart = math::linInterpolVec3(t1, botColor, midColor);
+        math::vec3 colorEnd = math::linInterpolVec3(t2, botColor, topColor);
+
+        if (xStart > xEnd) { swap(xStart, xEnd); swap(colorStart, colorEnd); }
+        for (int x=static_cast<int>(xStart); x<=static_cast<int>(xEnd); ++x) {
+            float t = (x-xStart)/(xEnd-xStart);
+            math::vec3 color = math::linInterpolVec3(t, colorEnd, colorStart);
+            display.setPixel(x, y, color);
+        }
+        xStart += invSlope3;
+        xEnd += invSlope2;
+    }
 }
