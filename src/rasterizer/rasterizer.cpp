@@ -13,29 +13,13 @@ void Rasterizer::render() {
     float height2 = 0.5f * display.getHeight();
     for (auto mesh : scene.getMeshes()) {
         for (auto triangle : mesh.getTriangles()) {
-            math::vec3 v0 = math::multMat4x4OnVec4(projectionMatrix, triangle.getVertexPos(0).toVec4(1)).dehomogenize();
-            math::vec3 v1 = math::multMat4x4OnVec4(projectionMatrix, triangle.getVertexPos(1).toVec4(1)).dehomogenize();
-            math::vec3 v2 = math::multMat4x4OnVec4(projectionMatrix, triangle.getVertexPos(2).toVec4(1)).dehomogenize();
-
-            v0.x += 1.0f;
-            v0.y += 1.0f;
-            v1.x += 1.0f;
-            v1.y += 1.0f;
-            v2.x += 1.0f;
-            v2.y += 1.0f;
-
-            v0.x *= width2;
-            v0.y *= height2;
-            v1.x *= width2;
-            v1.y *= height2;
-            v2.x *= width2;
-            v2.y *= height2;
-
             modelling::Triangle projected;
-            projected.setVertex(0, v0, triangle.getVertexColor(0));
-            projected.setVertex(1, v1, triangle.getVertexColor(1));
-            projected.setVertex(2, v2, triangle.getVertexColor(2));
-
+            for (auto i : { 0, 1, 2 }) {
+                math::vec3 v = math::multMat4x4OnVec4(projectionMatrix, triangle.getVertexPos(i).toVec4(1)).dehomogenize();
+                v.x = (v.x + 1.0f) * width2;
+                v.y = (v.y + 1.0f) * height2;
+                projected.setVertex(i, v, triangle.getVertexColor(i));
+            }
             drawTriangle(projected);
         }
     }
