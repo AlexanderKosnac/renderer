@@ -47,6 +47,10 @@ namespace math {
         return (length > 0.0f) ? vec3(vec.x/length, vec.y/length, vec.z/length) : vec3(0.0f, 0.0f, 0.0f);
     }
 
+    float dotVec4(vec4 vecA, vec4 vecB) {
+        return vecA.x * vecB.x + vecA.y * vecB.y + vecA.z * vecB.z + vecA.w * vecB.w;
+    }
+
     vec3 multMat3x3OnVec3(mat3x3 mat, vec3 vec) {
         return vec3(
             mat.a.x * vec.x + mat.b.x * vec.y + mat.c.x * vec.z,
@@ -73,11 +77,21 @@ namespace math {
     }
 
     mat4x4 multMat4x4OnMat4x4(mat4x4 matA, mat4x4 matB) {
+        vec4 r1 = vec4(matA.a.x, matA.b.x, matA.c.x, matA.d.x);
+        vec4 r2 = vec4(matA.a.y, matA.b.y, matA.c.y, matA.d.y);
+        vec4 r3 = vec4(matA.a.z, matA.b.z, matA.c.z, matA.d.z);
+        vec4 r4 = vec4(matA.a.w, matA.b.w, matA.c.w, matA.d.w);
+
+        vec4 c1 = matB.a;
+        vec4 c2 = matB.b;
+        vec4 c3 = matB.c;
+        vec4 c4 = matB.d;
+
         return mat4x4(
-            multMat4x4OnVec4(matA, vec4(matB.a.x, matB.b.x, matB.c.x, matB.d.x)),
-            multMat4x4OnVec4(matA, vec4(matB.a.y, matB.b.y, matB.c.y, matB.d.y)),
-            multMat4x4OnVec4(matA, vec4(matB.a.z, matB.b.z, matB.c.z, matB.d.z)),
-            multMat4x4OnVec4(matA, vec4(matB.a.w, matB.b.w, matB.c.w, matB.d.w))
+            vec4(dotVec4(r1, c1), dotVec4(r2, c1), dotVec4(r3, c1), dotVec4(r4, c1)),
+            vec4(dotVec4(r1, c2), dotVec4(r2, c2), dotVec4(r3, c2), dotVec4(r4, c2)),
+            vec4(dotVec4(r1, c3), dotVec4(r2, c3), dotVec4(r3, c3), dotVec4(r4, c3)),
+            vec4(dotVec4(r1, c4), dotVec4(r2, c4), dotVec4(r3, c4), dotVec4(r4, c4))
         );
     }
 
