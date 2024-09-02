@@ -170,6 +170,7 @@ int main() {
     bool running = true;
     while (running) {
         std::cout << "tick" << std::endl;
+        display.clearZBuffer();
         renderer.render();
         display.update();
     }

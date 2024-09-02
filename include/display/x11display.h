@@ -18,6 +18,7 @@ private:
     int width;
     int height;
     unsigned char* image;
+    float* zbuffer;
 
     std::map<CallbackType, std::vector<std::function<void(XEvent&)>>> listeners;
 
@@ -33,8 +34,9 @@ public:
 
     void handleEvent(XEvent &event);
     void update();
-    void setPixel(int x, int y, math::vec3& color);
+    void setPixel(int x, int y, float z, math::vec3& color);
     void clear();
+    void clearZBuffer();
 };
 
 #endif

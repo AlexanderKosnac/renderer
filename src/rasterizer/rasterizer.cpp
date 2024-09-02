@@ -1,5 +1,7 @@
 #include "rasterizer/rasterizer.h"
 
+#include <algorithm>
+
 #include "math.h"
 #include "display/x11display.h"
 #include "modelling/scene.h"
@@ -56,7 +58,7 @@ void Rasterizer::drawLine(float x1, float y1, math::vec3& color1, float x2, floa
             colorB = color1;
         }
 
-        display.setPixel(x, y, colorB);
+        display.setPixel(x, y, 0, colorB);
 
         for (int i=0; x<xe; i++) {
             x += 1;
@@ -67,7 +69,7 @@ void Rasterizer::drawLine(float x1, float y1, math::vec3& color1, float x2, floa
                 px = px + 2 * (dy1 - dx1);
             }
             math::vec3 color = math::linInterpolVec3((float)i/(float)dx1, colorA, colorB);
-            display.setPixel(x, y, color);
+            display.setPixel(x, y, 0, color);
         }
     } else {
         if (dy < 0) {
@@ -84,7 +86,7 @@ void Rasterizer::drawLine(float x1, float y1, math::vec3& color1, float x2, floa
             colorB = color1;
         }
 
-        display.setPixel(x, y, colorB);
+        display.setPixel(x, y, 0, colorB);
 
         for (int i=0; y<ye; i++) {
             y += 1;
@@ -95,7 +97,7 @@ void Rasterizer::drawLine(float x1, float y1, math::vec3& color1, float x2, floa
                 py = py + 2 * dx1;
             }
             math::vec3 color = math::linInterpolVec3((float)i/(float)dy1, colorA, colorB);
-            display.setPixel(x, y, color);
+            display.setPixel(x, y, 0, color);
         }
     }
 }
@@ -135,7 +137,8 @@ void Rasterizer::fillTriangle(modelling::Triangle& t) {
                     c0.y * l0 + c1.y * l1 + c2.y * l2,
                     c0.z * l0 + c1.z * l1 + c2.z * l2
                 );
-                display.setPixel(x, y, color);
+                float z = v0.z*l0 + v1.z*l1 + v2.z*l2;
+                display.setPixel(x, y, z, color);
             }
         }
     }

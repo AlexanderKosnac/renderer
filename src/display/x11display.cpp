@@ -4,6 +4,7 @@
 #include <map>
 #include <list>
 #include <cstdlib>
+#include <cfloat>
 
 #include "math.h"
 #include "display/x11display.h"
@@ -22,6 +23,7 @@ DisplayX11::DisplayX11(int pWidth, int pHeight) {
     width = pWidth;
     height = pHeight;
     image = new unsigned char[width*height*4];
+    zbuffer = new float[width*height];
 
     display = XOpenDisplay(nullptr);
     if (display == nullptr) {
@@ -75,18 +77,28 @@ void DisplayX11::update() {
     handleEvent(event);
 }
 
-void DisplayX11::setPixel(int x, int y, math::vec3& color) {
+void DisplayX11::setPixel(int x, int y, float z, math::vec3& color) {
     if (x < 0 || y < 0 || x >= width || y >= height) return;
-    int i = (y * width + x) * 4;
-    image[i+0] = color.z;
-    image[i+1] = color.y;
-    image[i+2] = color.x;
-    image[i+3] = 255;
+    int i = y * width + x;
+    if (zbuffer[i] < z) return;
+    zbuffer[i] = z;
+    int ii = i * 4;
+    image[ii+0] = color.z;
+    image[ii+1] = color.y;
+    image[ii+2] = color.x;
+    image[ii+3] = 255;
 }
 
 void DisplayX11::clear() {
     const int m = width*height*4;
     for (int i=0; i<m; ++i) {
         image[i] = 0;
+    }
+}
+
+void DisplayX11::clearZBuffer() {
+    const int m = width*height;
+    for (int i=0; i<m; ++i) {
+        zbuffer[i] = FLT_MAX;
     }
 }
