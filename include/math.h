@@ -47,6 +47,7 @@ namespace math {
     mat4x4 multMat4x4OnMat4x4(mat4x4 matA, mat4x4 matB);
 
     vec3 linInterpolVec3(float t, vec3& vecA, vec3& vecB);
+    void barycentric(const math::vec3& v0, const math::vec3& v1, const math::vec3& v2, const math::vec3& p, float& l1, float& l2, float& l3);
 }
 
 #endif

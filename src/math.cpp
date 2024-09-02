@@ -89,4 +89,12 @@ namespace math {
             vecA.z * t + vecB.z * ti
         );
     }
+
+    void barycentric(const math::vec3& v0, const math::vec3& v1, const math::vec3& v2, const math::vec3& p, float& l1, float& l2, float& l3) {
+        double denom = (v1.y-v2.y) * (v0.x-v2.x) + (v2.x-v1.x) * (v0.y-v2.y);
+
+        l1 = ((v1.y-v2.y) * (p.x-v2.x) + (v2.x-v1.x) * (p.y-v2.y)) / denom;
+        l2 = ((v2.y-v0.y) * (p.x-v2.x) + (v0.x-v2.x) * (p.y-v2.y)) / denom;
+        l3 = 1.0 - l1 - l2;
+    }
 }
