@@ -4,6 +4,7 @@
 
 #include "math.h"
 #include "display/x11display.h"
+#include "modelling/camera.h"
 #include "modelling/scene.h"
 
 Rasterizer::Rasterizer(DisplayX11& pDisplay, Scene& pScene) : display(pDisplay), scene(pScene) {
@@ -11,13 +12,18 @@ Rasterizer::Rasterizer(DisplayX11& pDisplay, Scene& pScene) : display(pDisplay),
 }
 
 void Rasterizer::render() {
+    math::mat4x4 viewProjectionMatrix = math::multMat4x4OnMat4x4(projectionMatrix, scene.getCamera().uvw);
+
     float width2 = 0.5f * display.getWidth();
     float height2 = 0.5f * display.getHeight();
     for (auto mesh : scene.getMeshes()) {
         for (auto triangle : mesh.getTriangles()) {
             modelling::Triangle projected;
             for (auto i : { 0, 1, 2 }) {
-                math::vec3 v = math::multMat4x4OnVec4(projectionMatrix, triangle.getVertexPos(i).toVec4(1)).dehomogenize();
+                math::vec3 v;
+                v = triangle.getVertexPos(i);
+                v = math::multMat4x4OnVec4(viewProjectionMatrix, v.toVec4(1)).dehomogenize();
+
                 v.x = (v.x + 1.0f) * width2;
                 v.y = (v.y + 1.0f) * height2;
                 projected.setVertex(i, v, triangle.getVertexColor(i));

@@ -1,4 +1,5 @@
 #include <X11/Xlib.h>
+
 #include <iostream>
 
 #include "math.h"
@@ -118,27 +119,35 @@ int main() {
 
     auto onKeyPress = [&camera](XEvent& event) mutable {
         math::vec3& pos = camera.getPos();
-        math::vec3 axis;
+        math::vec4* axis;
         bool sub = false;
         switch (event.xkey.keycode) {
             case 25: // W
-                axis = camera.normedW();
+                axis = &camera.uvw.c;
+                sub = true;
+                break;
+            case 24: // Q
+                axis = &camera.uvw.b;
+                break;
+            case 26: // E
+                axis = &camera.uvw.b;
+                sub = true;
                 break;
             case 38: // A
-                axis = camera.normedU();
-                sub = true;
+                axis = &camera.uvw.a;
                 break;
             case 39: // S
-                axis = camera.normedW();
-                sub = true;
+                axis = &camera.uvw.c;
                 break;
             case 40: // D
-                axis = camera.normedU();
+                axis = &camera.uvw.a;
+                sub = true;
                 break;
         }
-        sub ? pos.x -= axis.x : pos.x += axis.x;
-        sub ? pos.y -= axis.y : pos.y += axis.y;
-        sub ? pos.z -= axis.z : pos.z += axis.z;
+        float m = 0.1;
+        sub ? pos.x -= m*axis->x : pos.x += m*axis->x;
+        sub ? pos.y -= m*axis->y : pos.y += m*axis->y;
+        sub ? pos.z -= m*axis->z : pos.z += m*axis->z;
     };
 
     auto onKeyRelease = [&camera](XEvent& event) mutable {
@@ -170,7 +179,10 @@ int main() {
     bool running = true;
     while (running) {
         std::cout << "tick" << std::endl;
+        display.clear();
         display.clearZBuffer();
+        camera.updateCameraTransformation();
+        renderer.updateProjectionMatrix();
         renderer.render();
         display.update();
     }
