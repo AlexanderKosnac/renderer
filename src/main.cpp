@@ -25,14 +25,14 @@ int main() {
     math::vec3 v6 = math::vec3(1.0f, 0.0f, 1.0f);
     math::vec3 v7 = math::vec3(1.0f, 1.0f, 1.0f);
     // - Colors
-    math::vec3 c0 = math::vec3(255.0f, 0.0f, 0.0f);
-    math::vec3 c1 = math::vec3(255.0f, 0.0f, 0.0f);
-    math::vec3 c2 = math::vec3(255.0f, 0.0f, 0.0f);
-    math::vec3 c3 = math::vec3(255.0f, 0.0f, 0.0f);
-    math::vec3 c4 = math::vec3(255.0f, 0.0f, 0.0f);
-    math::vec3 c5 = math::vec3(255.0f, 0.0f, 0.0f);
-    math::vec3 c6 = math::vec3(255.0f, 0.0f, 0.0f);
-    math::vec3 c7 = math::vec3(255.0f, 0.0f, 0.0f);
+    math::vec3 c0 = math::vec3(255.0f,   0.0f,   0.0f);
+    math::vec3 c1 = math::vec3(  0.0f, 255.0f,   0.0f);
+    math::vec3 c2 = math::vec3(  0.0f,   0.0f, 255.0f);
+    math::vec3 c3 = math::vec3(255.0f, 255.0f,   0.0f);
+    math::vec3 c4 = math::vec3(255.0f,   0.0f, 255.0f);
+    math::vec3 c5 = math::vec3(  0.0f, 255.0f, 255.0f);
+    math::vec3 c6 = math::vec3(255.0f, 128.0f,   0.0f);
+    math::vec3 c7 = math::vec3(255.0f,   0.0f, 128.0f);
     // - Faces
     modelling::Triangle f0;
     f0.setVertex(0, v0, c0);
