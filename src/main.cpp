@@ -111,6 +111,36 @@ int main() {
     Scene scene(cam);
     scene.addMesh(mesh);
 
+    for (auto i : { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }) {
+        modelling::Triangle t0;
+        t0.setVertex(0, math::vec3(0.0f, -1.0f, 0.0f+i), c0);
+        t0.setVertex(1, math::vec3(0.0f, -1.0f, 0.5f+i), c0);
+        t0.setVertex(2, math::vec3(1.0f, -1.0f, 0.5f+i), c0);
+
+        modelling::Triangle t1;
+        t1.setVertex(0, math::vec3(0.0f+i, -1.0f, 0.0f), c1);
+        t1.setVertex(1, math::vec3(0.0f+i, -1.0f, 0.5f), c1);
+        t1.setVertex(2, math::vec3(1.0f+i, -1.0f, 0.5f), c1);
+
+        modelling::Triangle t2;
+        t2.setVertex(0, math::vec3(0.0f, -1.0f, 0.0f-i), c2);
+        t2.setVertex(1, math::vec3(0.0f, -1.0f, 0.5f-i), c2);
+        t2.setVertex(2, math::vec3(1.0f, -1.0f, 0.5f-i), c2);
+
+        modelling::Triangle t3;
+        t3.setVertex(0, math::vec3(0.0f-i, -1.0f, 0.0f), c3);
+        t3.setVertex(1, math::vec3(0.0f-i, -1.0f, 0.5f), c3);
+        t3.setVertex(2, math::vec3(1.0f-i, -1.0f, 0.5f), c3);
+
+        modelling::Mesh m;
+        m.addTriangle(t0);
+        m.addTriangle(t1);
+        m.addTriangle(t2);
+        m.addTriangle(t3);
+
+        scene.addMesh(m);
+    }
+
     modelling::Camera& camera = scene.getCamera();
 
     auto onExpose = [&camera](XEvent& event) mutable {
