@@ -34,7 +34,7 @@ namespace math {
 
     mat4x4::mat4x4(vec4 aa, vec4 bb, vec4 cc, vec4 dd) : a(aa), b(bb), c(cc), d(dd) {}
 
-    vec3 crossVec3(vec3 vecA, vec3 vecB) {
+    vec3 crossVec3(vec3& vecA, vec3& vecB) {
         return vec3(
             vecA.y * vecB.z - vecA.z * vecB.y,
             vecA.z * vecB.x - vecA.x * vecB.z,
@@ -42,12 +42,12 @@ namespace math {
         );
     }
 
-    vec3 normVec3(vec3 vec) {
+    vec3 normVec3(vec3& vec) {
         float length = std::sqrt(vec.x*vec.x + vec.y*vec.y + vec.z*vec.z);
         return (length > 0.0f) ? vec3(vec.x/length, vec.y/length, vec.z/length) : vec3(0.0f, 0.0f, 0.0f);
     }
 
-    float dotVec4(vec4 vecA, vec4 vecB) {
+    float dotVec4(vec4& vecA, vec4& vecB) {
         return vecA.x * vecB.x + vecA.y * vecB.y + vecA.z * vecB.z + vecA.w * vecB.w;
     }
 
