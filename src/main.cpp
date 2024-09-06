@@ -12,7 +12,7 @@
 #include "display/callbacktypes.h"
 
 int main() {
-    modelling::Camera cam(90.0f, .75f, 0.1f, 1000.0f, math::vec3(0.0f, 0.0f, 0.0f), math::vec3(0.0f, 1.0f, 0.0f), math::vec3(0.0f, 0.0f, 1.0f));
+    modelling::Camera cam(90.0f, 4.0/3.0, 0.1f, 100.0f, math::vec3(0.0f, 0.0f, 0.0f), math::vec3(0.0f, 1.0f, 0.0f), math::vec3(0.0f, 0.0f, 1.0f));
 
     // Origin Cube
     // - Vertices
@@ -156,7 +156,6 @@ int main() {
         switch (event.xkey.keycode) {
             case 25: // W
                 axis = &camera.cameraMatrix.c;
-                sub = true;
                 break;
             case 24: // Q
                 axis = &camera.cameraMatrix.b;
@@ -170,6 +169,7 @@ int main() {
                 break;
             case 39: // S
                 axis = &camera.cameraMatrix.c;
+                sub = true;
                 break;
             case 40: // D
                 axis = &camera.cameraMatrix.a;
@@ -228,9 +228,12 @@ int main() {
         std::cout << "tick" << std::endl;
         display.clear();
         display.clearZBuffer();
+
         camera.updateViewTransformation();
         renderer.updateProjectionMatrix();
+
         renderer.render();
+
         display.update();
     }
 }

@@ -32,13 +32,13 @@ namespace modelling {
     }
 
     void Camera::setProjectionMatrix(math::mat4x4& target) {
-        float fovRads = math::asRadians(fov);
+        float invTanFov = 1/tan(math::asRadians(fov)/2);
 
-        target.a.x = aspect*fovRads;
-        target.b.y = fovRads;
-        target.c.z = far/(far-near);
-        target.c.w = 1.0f;
-        target.d.z = (-far*near)/(far-near);
+        target.a.x = invTanFov/aspect;
+        target.b.y = invTanFov;
+        target.c.z = (far+near)/(near-far);
+        target.c.w = (2*far*near)/(near-far);
+        target.d.z = -1.0f;
     }
 
     math::vec3& Camera::getPos() {
