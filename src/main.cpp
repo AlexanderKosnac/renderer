@@ -149,35 +149,52 @@ int main() {
 
     auto onKeyPress = [&camera](XEvent& event) mutable {
         math::vec3& pos = camera.getPos();
-        math::vec4* axis;
+        math::vec3* axis;
         bool sub = false;
+        int yaw = 0;
+        int pitch = 0;
         switch (event.xkey.keycode) {
             case 25: // W
-                axis = &camera.uvw.c;
+                axis = &camera.cameraMatrix.c;
                 sub = true;
                 break;
             case 24: // Q
-                axis = &camera.uvw.b;
+                axis = &camera.cameraMatrix.b;
                 break;
             case 26: // E
-                axis = &camera.uvw.b;
+                axis = &camera.cameraMatrix.b;
                 sub = true;
                 break;
             case 38: // A
-                axis = &camera.uvw.a;
+                axis = &camera.cameraMatrix.a;
                 break;
             case 39: // S
-                axis = &camera.uvw.c;
+                axis = &camera.cameraMatrix.c;
                 break;
             case 40: // D
-                axis = &camera.uvw.a;
+                axis = &camera.cameraMatrix.a;
                 sub = true;
                 break;
+            case 111: // Up
+                pitch = -1;
+                break;
+            case 113: // Left
+                yaw = 1;
+                break;
+            case 114: // Right
+                yaw = -1;
+                break;
+            case 116: // Down
+                pitch = 1;
+                break;
+            default:
+                std::cout << event.xkey.keycode << std::endl;
         }
         float m = 0.1;
         sub ? pos.x -= m*axis->x : pos.x += m*axis->x;
         sub ? pos.y -= m*axis->y : pos.y += m*axis->y;
         sub ? pos.z -= m*axis->z : pos.z += m*axis->z;
+        camera.rotateLookAt(yaw, pitch, 0);
     };
 
     auto onKeyRelease = [&camera](XEvent& event) mutable {
@@ -211,7 +228,7 @@ int main() {
         std::cout << "tick" << std::endl;
         display.clear();
         display.clearZBuffer();
-        camera.updateCameraTransformation();
+        camera.updateViewTransformation();
         renderer.updateProjectionMatrix();
         renderer.render();
         display.update();

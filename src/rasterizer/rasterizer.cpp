@@ -12,7 +12,7 @@ Rasterizer::Rasterizer(DisplayX11& pDisplay, Scene& pScene) : display(pDisplay),
 }
 
 void Rasterizer::render() {
-    math::mat4x4 viewProjectionMatrix = math::multMat4x4OnMat4x4(projectionMatrix, scene.getCamera().uvw);
+    math::mat4x4 viewProjectionMatrix = math::multMat4x4OnMat4x4(projectionMatrix, scene.getCamera().viewMatrix);
 
     float width2 = 0.5f * display.getWidth();
     float height2 = 0.5f * display.getHeight();

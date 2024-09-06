@@ -3,18 +3,32 @@
 #include "cmath"
 
 #include "math.h"
+#include "modelling/transformations.h"
 
 namespace modelling {
 
     Camera::Camera(float pFov, float pAspect, float pNear, float pFar, math::vec3 pPos, math::vec3 pUp, math::vec3 pLookat) : fov(pFov), aspect(pAspect), near(pNear), far(pFar), pos(pPos), up(pUp), lookat(pLookat) {
-        updateCameraTransformation();
+        updateViewTransformation();
     }
 
-    void Camera::updateCameraTransformation() {
-        uvw.a = math::normVec3(math::crossVec3(up, lookat)).toVec4(0);
-        uvw.b = math::normVec3(math::crossVec3(lookat, uvw.a.toVec3())).toVec4(0);
-        uvw.c = math::normVec3(math::vec3(lookat.x, lookat.y, lookat.z)).toVec4(0);
-        uvw.d = pos.toVec4(1);
+    void Camera::rotateLookAt(int yaw, int pitch, int roll) {
+        if (yaw)   lookat = math::multMat3x3OnVec3(transformation::rotationY(yaw), lookat);
+        if (pitch) lookat = math::multMat3x3OnVec3(transformation::rotationX(pitch), lookat);
+        if (roll)  lookat = math::multMat3x3OnVec3(transformation::rotationZ(roll), lookat);
+    }
+
+    void Camera::updateViewTransformation() {
+        math::vec3 nRight = math::crossVec3(up, lookat);
+        math::vec3 nUp = math::crossVec3(lookat, nRight);
+
+        cameraMatrix.a = math::normVec3(nRight);
+        cameraMatrix.b = math::normVec3(nUp);
+        cameraMatrix.c = math::normVec3(lookat);
+
+        viewMatrix.a = math::vec4(cameraMatrix.a.x, cameraMatrix.b.x, cameraMatrix.c.x, 0.0f);
+        viewMatrix.b = math::vec4(cameraMatrix.a.y, cameraMatrix.b.y, cameraMatrix.c.y, 0.0f);
+        viewMatrix.c = math::vec4(cameraMatrix.a.z, cameraMatrix.b.z, cameraMatrix.c.z, 0.0f);
+        viewMatrix.d = math::vec4(-dotVec3(pos, cameraMatrix.a), -dotVec3(pos, cameraMatrix.b), -dotVec3(pos, cameraMatrix.c), 1.0f);
     }
 
     void Camera::setProjectionMatrix(math::mat4x4& target) {

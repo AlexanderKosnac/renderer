@@ -47,6 +47,10 @@ namespace math {
         return (length > 0.0f) ? vec3(vec.x/length, vec.y/length, vec.z/length) : vec3(0.0f, 0.0f, 0.0f);
     }
 
+    float dotVec3(vec3& vecA, vec3& vecB) {
+        return vecA.x * vecB.x + vecA.y * vecB.y + vecA.z * vecB.z;
+    }
+
     float dotVec4(vec4& vecA, vec4& vecB) {
         return vecA.x * vecB.x + vecA.y * vecB.y + vecA.z * vecB.z + vecA.w * vecB.w;
     }

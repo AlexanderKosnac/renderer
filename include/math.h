@@ -41,6 +41,7 @@ namespace math {
     vec3 crossVec3(vec3& vecA, vec3& vecB);
     vec3 normVec3(vec3& vec);
 
+    float dotVec3(vec3& vecA, vec3& vecB);
     float dotVec4(vec4& vecA, vec4& vecB);
 
     vec3 multMat3x3OnVec3(mat3x3 mat, vec3 vec);
