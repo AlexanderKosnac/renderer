@@ -28,8 +28,11 @@ void Rasterizer::render() {
                 v.y = (v.y + 1.0f) * height2;
                 projected.setVertex(i, v, triangle.getVertexColor(i));
             }
-            fillTriangle(projected);
-            drawTriangle(projected);
+            math::vec3 normal = projected.getNormal();
+            if (normal.z > 0) {
+                fillTriangle(projected);
+                drawTriangle(projected);
+            }
         }
     }
 }

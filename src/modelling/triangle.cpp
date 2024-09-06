@@ -17,4 +17,18 @@ namespace modelling {
         return color[i];
     }
 
+    math::vec3 Triangle::getNormal() {
+        math::vec3 l1(
+            pos[1].x - pos[0].x,
+            pos[1].y - pos[0].y,
+            pos[1].z - pos[0].z
+        );
+        math::vec3 l2(
+            pos[2].x - pos[0].x,
+            pos[2].y - pos[0].y,
+            pos[2].z - pos[0].z
+        );
+        math::vec3 c = math::crossVec3(l1, l2);
+        return math::normVec3(c);
+    }
 }
