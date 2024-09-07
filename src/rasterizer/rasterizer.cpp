@@ -13,6 +13,7 @@ Rasterizer::Rasterizer(DisplayX11& pDisplay, Scene& pScene) : display(pDisplay),
 
 void Rasterizer::render() {
     math::mat4x4 viewProjectionMatrix = math::multMat4x4OnMat4x4(projectionMatrix, scene.getCamera().viewMatrix);
+    math::vec3& pos = scene.getCamera().pos;
 
     float width2 = 0.5f * display.getWidth();
     float height2 = 0.5f * display.getHeight();
@@ -20,19 +21,38 @@ void Rasterizer::render() {
         for (auto triangle : mesh.getTriangles()) {
             modelling::Triangle projected;
             for (auto i : { 0, 1, 2 }) {
-                math::vec3 v;
-                v = triangle.getVertexPos(i);
+                math::vec3 v = triangle.getVertexPos(i);
+                // Apply model to world coordinate transformations here
+
+                projected.pos[i] = v;
+            }
+            math::vec3 normal = projected.getNormal();
+            math::vec3 cam(
+                projected.pos[0].x - pos.x,
+                projected.pos[0].y - pos.y,
+                projected.pos[0].z - pos.z
+            );
+            if (math::dotVec3(normal, cam) < 0.0f) continue; // We are looking on the backside of the triangle, skip.
+
+            for (auto i : { 0, 1, 2 }) {
+                math::vec3 v = triangle.getVertexPos(i);
+
                 v = math::multMat4x4OnVec4(viewProjectionMatrix, v.toVec4(1)).dehomogenize();
 
                 v.x = (v.x + 1.0f) * width2;
                 v.y = (v.y + 1.0f) * height2;
-                projected.setVertex(i, v, triangle.getVertexColor(i));
+
+                projected.pos[i] = v;
+                projected.color[i] = triangle.getVertexColor(i);                
             }
             math::vec3 normal = projected.getNormal();
             if (normal.z > 0) {
                 fillTriangle(projected);
                 drawTriangle(projected);
             }
+
+            //fillTriangle(projected);
+            drawTriangle(projected);
         }
     }
 }
