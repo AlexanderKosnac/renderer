@@ -25,7 +25,9 @@ void Rasterizer::render() {
                 // Apply model to world coordinate transformations here
 
                 projected.pos[i] = v;
+                projected.color[i] = triangle.getVertexColor(i);
             }
+
             math::vec3 normal = projected.getNormal();
             math::vec3 cam(
                 projected.pos[0].x - pos.x,
@@ -35,23 +37,23 @@ void Rasterizer::render() {
             if (math::dotVec3(normal, cam) < 0.0f) continue; // We are looking on the backside of the triangle, skip.
 
             for (auto i : { 0, 1, 2 }) {
-                math::vec3 v = triangle.getVertexPos(i);
+                math::vec3 v = projected.pos[i];
 
                 v = math::multMat4x4OnVec4(viewProjectionMatrix, v.toVec4(1)).dehomogenize();
 
                 v.x = (v.x + 1.0f) * width2;
                 v.y = (v.y + 1.0f) * height2;
 
+                float sim = math::dotVec3(normal, scene.getAmbientLight());
+                if (sim < 0.3) sim = 0.3; // Minimum Lighting
+
                 projected.pos[i] = v;
-                projected.color[i] = triangle.getVertexColor(i);                
-            }
-            math::vec3 normal = projected.getNormal();
-            if (normal.z > 0) {
-                fillTriangle(projected);
-                drawTriangle(projected);
+                projected.color[i].x *= sim;
+                projected.color[i].y *= sim;
+                projected.color[i].z *= sim;
             }
 
-            //fillTriangle(projected);
+            fillTriangle(projected);
             drawTriangle(projected);
         }
     }

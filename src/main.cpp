@@ -108,7 +108,9 @@ int main() {
     mesh.addTriangle(f10);
     mesh.addTriangle(f11);
 
-    Scene scene(cam);
+    math::vec3 light(0.0f, -1.0f, 0.0f);
+
+    Scene scene(cam, light);
     scene.addMesh(mesh);
 
     for (auto i : { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }) {
