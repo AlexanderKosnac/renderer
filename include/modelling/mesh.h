@@ -2,6 +2,7 @@
 #define MESH
 
 #include <vector>
+#include <string>
 
 #include "math.h"
 #include "modelling/triangle.h"
@@ -14,10 +15,13 @@ namespace modelling {
 
     public:
         Mesh();
+        Mesh(const std::string& filepath);
 
         void addTriangle(Triangle& t);
 
         const std::vector<Triangle>& getTriangles();
+
+        bool fromObjFile(const std::string& filepath);
     };
 
 }
