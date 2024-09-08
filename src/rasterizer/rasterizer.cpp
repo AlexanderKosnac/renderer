@@ -34,7 +34,7 @@ void Rasterizer::render() {
                 projected.pos[0].y - pos.y,
                 projected.pos[0].z - pos.z
             );
-            if (math::dotVec3(normal, cam) < 0.0f) continue; // We are looking on the backside of the triangle, skip.
+            if (math::dotVec3(normal, cam) > 0.0f) continue; // We are looking on the backside of the triangle, skip.
 
             for (auto i : { 0, 1, 2 }) {
                 math::vec3 v = projected.pos[i];
