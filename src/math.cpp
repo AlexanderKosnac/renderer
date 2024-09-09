@@ -30,9 +30,21 @@ namespace math {
         return (w == 0.0f) ? vec3(x, y, z) : vec3(x/w, y/w, z/w);
     }
 
+    mat3x3::mat3x3() : a(vec3()), b(vec3()), c(vec3()) {}
+
     mat3x3::mat3x3(vec3 aa, vec3 bb, vec3 cc) : a(aa), b(bb), c(cc) {}
 
+    mat3x3::mat3x3(const mat3x3& other) : a(other.a), b(other.b), c(other.c) {}
+
+    math::mat4x4 mat3x3::toMat4x4() {
+        return math::mat4x4(a.toVec4(0), b.toVec4(0), c.toVec4(0), math::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+    }
+
+    mat4x4::mat4x4() : a(vec4()), b(vec4()), c(vec4()), d(vec4()) {}
+
     mat4x4::mat4x4(vec4 aa, vec4 bb, vec4 cc, vec4 dd) : a(aa), b(bb), c(cc), d(dd) {}
+
+    mat4x4::mat4x4(const mat4x4& other) : a(other.a), b(other.b), c(other.c), d(other.d) {}
 
     vec3 crossVec3(vec3& vecA, vec3& vecB) {
         return vec3(

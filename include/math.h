@@ -26,16 +26,24 @@ namespace math {
         vec3 dehomogenize();
     };
 
+    struct mat4x4; // Forward declaration of mat4x4
+
     struct mat3x3 {
         vec3 a, b, c;
 
+        mat3x3();
         mat3x3(vec3 aa, vec3 bb, vec3 cc);
+        mat3x3(const mat3x3& other);
+
+        mat4x4 toMat4x4();
     };
 
     struct mat4x4 {
         vec4 a, b, c, d;
 
+        mat4x4();
         mat4x4(vec4 aa, vec4 bb, vec4 cc, vec4 dd);
+        mat4x4(const mat4x4& other);
     };
 
     vec3 crossVec3(vec3& vecA, vec3& vecB);
