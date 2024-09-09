@@ -2,12 +2,16 @@
 
 Scene::Scene(modelling::Camera& c, math::vec3& ambientLight) : camera(c), ambientLight(ambientLight) {}
 
-void Scene::addMesh(modelling::Mesh& mesh) {
-    meshes.push_back(mesh);
+void Scene::addObject(modelling::Mesh& mesh) {
+    objects.push_back(modelling::SceneObject { mesh, std::vector<math::mat4x4>() });
 }
 
-const std::vector<modelling::Mesh>& Scene::getMeshes() {
-    return meshes;
+void Scene::addObject(modelling::Mesh& mesh, std::vector<math::mat4x4>& modelTransformation) {
+    objects.push_back(modelling::SceneObject { mesh, modelTransformation });
+}
+
+const std::vector<modelling::SceneObject>& Scene::getObjects() {
+    return objects;
 }
 
 modelling::Camera& Scene::getCamera() {

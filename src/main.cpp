@@ -1,26 +1,29 @@
 #include <X11/Xlib.h>
 
 #include <iostream>
+#include <vector>
 
 #include "math.h"
 #include "modelling/triangle.h"
 #include "modelling/mesh.h"
 #include "modelling/camera.h"
 #include "modelling/scene.h"
+#include "modelling/transformations.h"
 #include "rasterizer/rasterizer.h"
 #include "display/x11display.h"
 #include "display/callbacktypes.h"
 
 int main() {
-    modelling::Camera cam(90.0f, 4.0/3.0, 0.1f, 100.0f, math::vec3(0.0f, 0.0f, 0.0f), math::vec3(0.0f, 1.0f, 0.0f), math::vec3(0.0f, 0.0f, 1.0f));
+    modelling::Camera cam(90.0f, 4.0/3.0, 0.1f, 1000.0f, math::vec3(0.0f, 0.0f, 0.0f), math::vec3(0.0f, 1.0f, 0.0f), math::vec3(0.0f, 0.0f, 1.0f));
 
     //modelling::Mesh mesh("objs/axis.obj");
+    modelling::Mesh axisMesh("objs/axis.obj");
     modelling::Mesh mesh("objs/cube.obj");
 
     math::vec3 light(0.0f, -1.0f, 0.0f);
 
     Scene scene(cam, light);
-    scene.addMesh(mesh);
+    scene.addObject(axisMesh);
 
     modelling::Camera& camera = scene.getCamera();
 

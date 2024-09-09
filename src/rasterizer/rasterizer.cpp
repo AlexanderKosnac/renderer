@@ -17,14 +17,16 @@ void Rasterizer::render() {
 
     float width2 = 0.5f * display.getWidth();
     float height2 = 0.5f * display.getHeight();
-    for (auto mesh : scene.getMeshes()) {
-        for (auto triangle : mesh.getTriangles()) {
+    for (auto object : scene.getObjects()) {
+        for (auto triangle : object.mesh.getTriangles()) {
             modelling::Triangle projected;
             for (auto i : { 0, 1, 2 }) {
-                math::vec3 v = triangle.getVertexPos(i);
+                math::vec4 v = triangle.getVertexPos(i).toVec4(1);
                 // Apply model to world coordinate transformations here
-
-                projected.pos[i] = v;
+                for (auto transformation : object.modelTransformations) {
+                    v = math::multMat4x4OnVec4(transformation, v);
+                }
+                projected.pos[i] = v.toVec3();
                 projected.color[i] = triangle.getVertexColor(i);
             }
 
