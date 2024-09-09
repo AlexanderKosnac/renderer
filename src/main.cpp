@@ -30,31 +30,37 @@ int main() {
 
     auto onKeyPress = [&camera](XEvent& event) mutable {
         math::vec3& pos = camera.getPos();
-        math::vec3* axis;
-        bool sub = false;
-        int yaw = 0;
-        int pitch = 0;
+        float m = 0.5;
         switch (event.xkey.keycode) {
             case 25: // W
-                axis = &camera.cameraMatrix.c;
+                pos.x += m*camera.cameraMatrix.c.x;
+                pos.y += m*camera.cameraMatrix.c.y;
+                pos.z += m*camera.cameraMatrix.c.z;
                 break;
             case 24: // Q
-                axis = &camera.cameraMatrix.b;
+                pos.x += m*camera.cameraMatrix.b.x;
+                pos.y += m*camera.cameraMatrix.b.y;
+                pos.z += m*camera.cameraMatrix.b.z;
                 break;
             case 26: // E
-                axis = &camera.cameraMatrix.b;
-                sub = true;
+                pos.x -= m*camera.cameraMatrix.b.x;
+                pos.y -= m*camera.cameraMatrix.b.y;
+                pos.z -= m*camera.cameraMatrix.b.z;
                 break;
             case 38: // A
-                axis = &camera.cameraMatrix.a;
+                pos.x -= m*camera.cameraMatrix.a.x;
+                pos.y -= m*camera.cameraMatrix.a.y;
+                pos.z -= m*camera.cameraMatrix.a.z;
                 break;
             case 39: // S
-                axis = &camera.cameraMatrix.c;
-                sub = true;
+                pos.x -= m*camera.cameraMatrix.c.x;
+                pos.y -= m*camera.cameraMatrix.c.y;
+                pos.z -= m*camera.cameraMatrix.c.z;
                 break;
             case 40: // D
-                axis = &camera.cameraMatrix.a;
-                sub = true;
+                pos.x += m*camera.cameraMatrix.a.x;
+                pos.y += m*camera.cameraMatrix.a.y;
+                pos.z += m*camera.cameraMatrix.a.z;
                 break;
             case 111: // Up
                 pitch = -1;
@@ -71,10 +77,6 @@ int main() {
             default:
                 std::cout << event.xkey.keycode << std::endl;
         }
-        float m = 0.1;
-        sub ? pos.x -= m*axis->x : pos.x += m*axis->x;
-        sub ? pos.y -= m*axis->y : pos.y += m*axis->y;
-        sub ? pos.z -= m*axis->z : pos.z += m*axis->z;
         camera.rotateLookAt(yaw, pitch, 0);
     };
 
@@ -94,7 +96,7 @@ int main() {
         std::cout << "Mouse Moved to (" << event.xmotion.x << ", " << event.xmotion.y << ")" << std::endl;
     };
 
-    DisplayX11 display(480, 360);
+    DisplayX11 display(960, 720);
     display.addListener(EXPOSE, onExpose);
     display.addListener(KEY_PRESS, onKeyPress);
     display.addListener(KEY_RELEASE, onKeyRelease);
