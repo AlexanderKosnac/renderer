@@ -14,7 +14,7 @@
 #include "display/callbacktypes.h"
 
 int main() {
-    modelling::Camera cam(90.0f, 4.0/3.0, 0.1f, 1000.0f, math::vec3(0.0f, 0.0f, 0.0f), math::vec3(0.0f, 1.0f, 0.0f), math::vec3(0.0f, 0.0f, 1.0f));
+    modelling::Camera cam(90.0f, 4.0/3.0, 0.1f, 1000.0f, math::vec3(0.0f, 0.0f, 0.0f), math::vec3(0.0f, 1.0f, 0.0f), math::vec3(0.0f, 0.0f, -1.0f));
 
     //modelling::Mesh mesh("objs/axis.obj");
     modelling::Mesh axisMesh("objs/axis.obj");
@@ -34,11 +34,12 @@ int main() {
     auto onKeyPress = [&camera](XEvent& event) mutable {
         math::vec3& pos = camera.getPos();
         float m = 0.5;
+        float degree = 1.0f;
         switch (event.xkey.keycode) {
             case 25: // W
-                pos.x += m*camera.cameraMatrix.c.x;
-                pos.y += m*camera.cameraMatrix.c.y;
-                pos.z += m*camera.cameraMatrix.c.z;
+                pos.x -= m*camera.cameraMatrix.c.x;
+                pos.y -= m*camera.cameraMatrix.c.y;
+                pos.z -= m*camera.cameraMatrix.c.z;
                 break;
             case 24: // Q
                 pos.x += m*camera.cameraMatrix.b.x;
@@ -56,9 +57,9 @@ int main() {
                 pos.z -= m*camera.cameraMatrix.a.z;
                 break;
             case 39: // S
-                pos.x -= m*camera.cameraMatrix.c.x;
-                pos.y -= m*camera.cameraMatrix.c.y;
-                pos.z -= m*camera.cameraMatrix.c.z;
+                pos.x += m*camera.cameraMatrix.c.x;
+                pos.y += m*camera.cameraMatrix.c.y;
+                pos.z += m*camera.cameraMatrix.c.z;
                 break;
             case 40: // D
                 pos.x += m*camera.cameraMatrix.a.x;
@@ -66,21 +67,20 @@ int main() {
                 pos.z += m*camera.cameraMatrix.a.z;
                 break;
             case 111: // Up
-                pitch = -1;
+                camera.pitchLookAt(-degree);
                 break;
             case 113: // Left
-                yaw = 1;
+                camera.yawLookAt(degree);
                 break;
             case 114: // Right
-                yaw = -1;
+                camera.yawLookAt(-degree);
                 break;
             case 116: // Down
-                pitch = 1;
+                camera.pitchLookAt(degree);
                 break;
             default:
                 std::cout << event.xkey.keycode << std::endl;
         }
-        camera.rotateLookAt(yaw, pitch, 0);
     };
 
     auto onKeyRelease = [&camera](XEvent& event) mutable {
