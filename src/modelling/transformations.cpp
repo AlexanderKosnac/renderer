@@ -48,6 +48,10 @@ namespace transformation {
         );
     }
 
+    math::mat3x3 scale(float m) {
+        return scaleXYZ(m, m, m);
+    }
+
     math::mat3x3 scaleXYZ(float x, float y, float z) {
         return math::mat3x3(
             math::vec3(   x, 0.0f, 0.0f),
