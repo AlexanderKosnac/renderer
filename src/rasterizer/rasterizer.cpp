@@ -46,8 +46,8 @@ void Rasterizer::render() {
                 v.x = (v.x + 1.0f) * width2;
                 v.y = (v.y + 1.0f) * height2;
 
-                float sim = math::dotVec3(normal, scene.getAmbientLight());
-                if (sim < 0.3) sim = 0.3; // Minimum Lighting
+                float sim = (math::dotVec3(normal, scene.getAmbientLight())+ 1.0f) * 0.5f; // [-1; 1] -> w[0; 1]
+                if (sim < 0.1) sim = 0.1; // Minimum Lighting
 
                 projected.pos[i] = v;
                 projected.color[i].x *= sim;
