@@ -6,7 +6,7 @@ void Scene::addObject(modelling::Mesh& mesh) {
     objects.push_back(modelling::SceneObject { mesh, std::vector<math::mat4x4>() });
 }
 
-void Scene::addObject(modelling::Mesh& mesh, std::vector<math::mat4x4>& modelTransformation) {
+void Scene::addObject(modelling::Mesh& mesh, const std::vector<math::mat4x4>& modelTransformation) {
     objects.push_back(modelling::SceneObject { mesh, modelTransformation });
 }
 

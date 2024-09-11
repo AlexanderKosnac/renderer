@@ -23,7 +23,15 @@ int main() {
     math::vec3 light(0.0f, -1.0f, 0.0f);
 
     Scene scene(cam, light);
-    scene.addObject(axisMesh);
+
+    scene.addObject(axisMesh, {
+        transformation::scaleXYZ(0.1f, 0.1f, 0.1f).toMat4x4(),
+        transformation::translate(0.0f, 0.0f, -100.0f),
+    });
+
+    scene.addObject(mesh, {
+        transformation::translate(0.0f, 0.0f, -100.0f),
+    });
 
     modelling::Camera& camera = scene.getCamera();
 
