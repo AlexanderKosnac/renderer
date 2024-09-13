@@ -35,9 +35,7 @@ int main() {
 
     modelling::Camera& camera = scene.getCamera();
 
-    auto onExpose = [&camera](XEvent& event) mutable {
-        std::cout << "Expose" << std::endl;
-    };
+    auto onExpose = [&camera](XEvent& event) mutable {};
 
     auto onKeyPress = [&camera](XEvent& event) mutable {
         math::vec3& pos = camera.getPos();
@@ -91,21 +89,13 @@ int main() {
         }
     };
 
-    auto onKeyRelease = [&camera](XEvent& event) mutable {
-        std::cout << "Key released: " << XLookupKeysym(&event.xkey, 0) << std::endl;
-    };
+    auto onKeyRelease = [&camera](XEvent& event) mutable {};
 
-    auto onButtonPress = [&camera](XEvent& event) mutable {
-        std::cout << "Mouse Button " << event.xbutton.button << " Pressed at (" << event.xbutton.x  << ", " << event.xbutton.y << ")" << std::endl;
-    };
+    auto onButtonPress = [&camera](XEvent& event) mutable {};
 
-    auto onButtonRelease = [&camera](XEvent& event) mutable {
-        std::cout << "Mouse Button " << event.xbutton.button << " Released at (" << event.xbutton.x << ", " << event.xbutton.y << ")" << std::endl;
-    };
+    auto onButtonRelease = [&camera](XEvent& event) mutable {};
 
-    auto onMouseMotion = [&camera](XEvent& event) mutable {
-        std::cout << "Mouse Moved to (" << event.xmotion.x << ", " << event.xmotion.y << ")" << std::endl;
-    };
+    auto onMouseMotion = [&camera](XEvent& event) mutable {};
 
     DisplayX11 display(960, 720);
     display.addListener(EXPOSE, onExpose);
