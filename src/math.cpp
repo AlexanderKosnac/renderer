@@ -127,4 +127,18 @@ namespace math {
         l2 = ((v2.y-v0.y) * (p.x-v2.x) + (v0.x-v2.x) * (p.y-v2.y)) / denom;
         l3 = 1.0 - l1 - l2;
     }
+
+    vec3 vectorPlaneIntersection(vec3& planePoint, vec3& planeNormal, vec3& lineStart, vec3& lineEnd) {
+        vec3 normal = normVec3(planeNormal);
+        float d = -dotVec3(planePoint, normal);
+        float ad = dotVec3(lineStart, normal);
+        float bd = dotVec3(lineEnd, normal);
+        float t = (-d - ad) / (bd - ad);
+        return vec3(
+            (lineEnd.x - lineStart.x) * t + lineStart.x,
+            (lineEnd.y - lineStart.y) * t + lineStart.y,
+            (lineEnd.z - lineStart.z) * t + lineStart.z
+        );
+    }
+
 }

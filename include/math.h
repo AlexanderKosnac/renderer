@@ -59,6 +59,9 @@ namespace math {
 
     vec3 linInterpolVec3(float t, vec3& vecA, vec3& vecB);
     void barycentric(const math::vec3& v0, const math::vec3& v1, const math::vec3& v2, const math::vec3& p, float& l1, float& l2, float& l3);
+
+    vec3 vectorPlaneIntersection(vec3& planePoint, vec3& planeNormal, vec3& lineStart, vec3& lineEnd);
+
 }
 
 #endif
