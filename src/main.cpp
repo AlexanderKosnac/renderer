@@ -35,7 +35,10 @@ int main() {
 
     modelling::Camera& camera = scene.getCamera();
 
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-parameter"
     auto onExpose = [&camera](XEvent& event) mutable {};
+    #pragma GCC diagnostic pop
 
     auto onKeyPress = [&camera](XEvent& event) mutable {
         math::vec3& pos = camera.getPos();
@@ -89,13 +92,25 @@ int main() {
         }
     };
 
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-parameter"
     auto onKeyRelease = [&camera](XEvent& event) mutable {};
+    #pragma GCC diagnostic pop
 
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-parameter"
     auto onButtonPress = [&camera](XEvent& event) mutable {};
+    #pragma GCC diagnostic pop
 
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-parameter"
     auto onButtonRelease = [&camera](XEvent& event) mutable {};
+    #pragma GCC diagnostic pop
 
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-parameter"
     auto onMouseMotion = [&camera](XEvent& event) mutable {};
+    #pragma GCC diagnostic pop
 
     DisplayX11 display(960, 720);
     display.addListener(EXPOSE, onExpose);
