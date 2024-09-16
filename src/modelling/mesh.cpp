@@ -33,33 +33,24 @@ namespace modelling {
         std::vector<Triangle> faces;
 
         std::string line;
-        std::string trash;        
+        std::string prefix;
         while (std::getline(file, line)) {
+            if (line.empty() || line[0] == '#') continue;
+
             std::istringstream iss(line);
-            if (line.empty()) continue;
-            switch(line[0]) {
-                case '#':
-                    break;
-                case 'v':
-                    {
-                        math::vec3 v;
-                        iss >> trash >> v.x >> v.y >> v.z;
-                        vertices.push_back(v);
-                    }
-                    break;
-                case 'f':
-                    {
-                        Triangle f;
-                        int a, b, c;
-                        iss >> trash >> a >> b >> c;
-                        f.setVertex(0, vertices[a-1], color);
-                        f.setVertex(1, vertices[b-1], color);
-                        f.setVertex(2, vertices[c-1], color);
-                        faces.push_back(f);
-                    }
-                    break;
-                default:
-                    break;
+            iss >> prefix;
+            if (prefix == "v") {
+                math::vec3 v;
+                iss >> v.x >> v.y >> v.z;
+                vertices.push_back(v);
+            } else if (prefix == "f") {
+                Triangle f;
+                int a, b, c;
+                iss >> a >> b >> c;
+                f.setVertex(0, vertices[a-1], color);
+                f.setVertex(1, vertices[b-1], color);
+                f.setVertex(2, vertices[c-1], color);
+                faces.push_back(f);
             }
         }
 
@@ -70,4 +61,5 @@ namespace modelling {
         file.close();
         return true;
     }
+
 }
