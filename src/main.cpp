@@ -167,7 +167,7 @@ int main(int argc, char* argv[]) {
 
         end = std::chrono::steady_clock::now();
         ms = std::chrono::duration_cast<std::chrono::milliseconds> (end - begin).count();
-        printf("Tick in %d ms (%.2f fps)\n", ms, 1000.0f/ms);
+        printf("Tick in %d ms (%.2f fps)\n", ms, 1000.0f/((ms == 0) ? 1 : ms));
         display.update();
         begin = std::chrono::steady_clock::now();
     }
