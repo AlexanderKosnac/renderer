@@ -42,13 +42,13 @@ int main() {
 
     auto onKeyPress = [&camera](XEvent& event) mutable {
         math::vec3& pos = camera.getPos();
-        float m = 0.5;
+        float m = 1.5;
         float degree = 1.0f;
         switch (event.xkey.keycode) {
             case 25: // W
-                pos.x -= m*camera.cameraMatrix.c.x;
-                pos.y -= m*camera.cameraMatrix.c.y;
-                pos.z -= m*camera.cameraMatrix.c.z;
+                pos.x += m*camera.cameraMatrix.c.x;
+                pos.y += m*camera.cameraMatrix.c.y;
+                pos.z += m*camera.cameraMatrix.c.z;
                 break;
             case 24: // Q
                 pos.x += m*camera.cameraMatrix.b.x;
@@ -61,19 +61,19 @@ int main() {
                 pos.z -= m*camera.cameraMatrix.b.z;
                 break;
             case 38: // A
-                pos.x -= m*camera.cameraMatrix.a.x;
-                pos.y -= m*camera.cameraMatrix.a.y;
-                pos.z -= m*camera.cameraMatrix.a.z;
-                break;
-            case 39: // S
-                pos.x += m*camera.cameraMatrix.c.x;
-                pos.y += m*camera.cameraMatrix.c.y;
-                pos.z += m*camera.cameraMatrix.c.z;
-                break;
-            case 40: // D
                 pos.x += m*camera.cameraMatrix.a.x;
                 pos.y += m*camera.cameraMatrix.a.y;
                 pos.z += m*camera.cameraMatrix.a.z;
+                break;
+            case 39: // S
+                pos.x -= m*camera.cameraMatrix.c.x;
+                pos.y -= m*camera.cameraMatrix.c.y;
+                pos.z -= m*camera.cameraMatrix.c.z;
+                break;
+            case 40: // D
+                pos.x -= m*camera.cameraMatrix.a.x;
+                pos.y -= m*camera.cameraMatrix.a.y;
+                pos.z -= m*camera.cameraMatrix.a.z;
                 break;
             case 111: // Up
                 camera.pitchLookAt(-degree);
@@ -122,9 +122,12 @@ int main() {
 
     Rasterizer renderer(display, scene);
 
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+    int ms;
+
     bool running = true;
     while (running) {
-        std::cout << "tick" << std::endl;
         display.clear();
         display.clearZBuffer();
 
@@ -133,6 +136,10 @@ int main() {
 
         renderer.render();
 
+        end = std::chrono::steady_clock::now();
+        ms = std::chrono::duration_cast<std::chrono::milliseconds> (end - begin).count();
+        printf("Tick in %d ms (%.2f fps)\n", ms, 1000.0f/ms);
         display.update();
+        begin = std::chrono::steady_clock::now();
     }
 }
