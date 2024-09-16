@@ -57,10 +57,10 @@ namespace math {
     mat3x3 multMat3x3OnMat3x3(mat3x3 matA, mat3x3 matB);
     mat4x4 multMat4x4OnMat4x4(mat4x4 matA, mat4x4 matB);
 
-    vec3 linInterpolVec3(float t, vec3& vecA, vec3& vecB);
+    vec3 linInterpolVec3(float t, const vec3& vecA, const vec3& vecB);
     void barycentric(const math::vec3& v0, const math::vec3& v1, const math::vec3& v2, const math::vec3& p, float& l1, float& l2, float& l3);
 
-    vec3 vectorPlaneIntersection(const vec3& planePoint, const vec3& planeNormal, const vec3& lineStart, const vec3& lineEnd);
+    vec3 vectorPlaneIntersection(const vec3& planePoint, const vec3& planeNormal, const vec3& lineStart, const vec3& lineEnd, float& t);
 
 }
 

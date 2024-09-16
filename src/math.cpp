@@ -112,7 +112,7 @@ namespace math {
         );
     }
 
-    vec3 linInterpolVec3(float t, vec3& vecA, vec3& vecB) {
+    vec3 linInterpolVec3(float t, const vec3& vecA, const vec3& vecB) {
         float ti = 1 - t;
         return vec3(
             vecA.x * t + vecB.x * ti,
@@ -129,12 +129,12 @@ namespace math {
         l3 = 1.0 - l1 - l2;
     }
 
-    vec3 vectorPlaneIntersection(const vec3& planePoint, const vec3& planeNormal, const vec3& lineStart, const vec3& lineEnd) {
+    vec3 vectorPlaneIntersection(const vec3& planePoint, const vec3& planeNormal, const vec3& lineStart, const vec3& lineEnd, float& t) {
         vec3 normal = normVec3(planeNormal);
         float d = -dotVec3(planePoint, normal);
         float ad = dotVec3(lineStart, normal);
         float bd = dotVec3(lineEnd, normal);
-        float t = (-d - ad) / (bd - ad);
+        t = (-d - ad) / (bd - ad);
         return vec3(
             (lineEnd.x - lineStart.x) * t + lineStart.x,
             (lineEnd.y - lineStart.y) * t + lineStart.y,
