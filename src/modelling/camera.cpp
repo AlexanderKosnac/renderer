@@ -1,5 +1,6 @@
 #include "modelling/camera.h"
 
+#include <cmath>
 #include <algorithm>
 
 #include "math.h"
