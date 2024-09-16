@@ -1,62 +1,107 @@
 #include "rasterizer/rasterizer.h"
 
 #include <algorithm>
+#include <list>
 
 #include "math.h"
 #include "display/x11display.h"
 #include "modelling/camera.h"
 #include "modelling/scene.h"
+#include "modelling/transformations.h"
 
 Rasterizer::Rasterizer(DisplayX11& pDisplay, Scene& pScene) : display(pDisplay), scene(pScene) {
     updateProjectionMatrix();
 }
 
 void Rasterizer::render() {
-    math::mat4x4 viewProjectionMatrix = math::multMat4x4OnMat4x4(projectionMatrix, scene.getCamera().viewMatrix);
     math::vec3& pos = scene.getCamera().pos;
 
     float width2 = 0.5f * display.getWidth();
     float height2 = 0.5f * display.getHeight();
+
+    std::vector<modelling::Triangle> depthClippedTriangles;
+
     for (auto object : scene.getObjects()) {
         for (auto triangle : object.mesh.getTriangles()) {
-            modelling::Triangle projected;
+            modelling::Triangle transformed;
             for (auto i : { 0, 1, 2 }) {
                 math::vec4 v = triangle.getVertexPos(i).toVec4(1);
                 // Apply model to world coordinate transformations here
                 for (auto transformation : object.modelTransformations) {
                     v = math::multMat4x4OnVec4(transformation, v);
                 }
-                projected.pos[i] = v.toVec3();
-                projected.color[i] = triangle.getVertexColor(i);
+                transformed.pos[i] = v.toVec3();
+                transformed.color[i] = triangle.getVertexColor(i);
             }
 
-            math::vec3 normal = projected.getNormal();
-            math::vec3 cam(
-                projected.pos[0].x - pos.x,
-                projected.pos[0].y - pos.y,
-                projected.pos[0].z - pos.z
-            );
-            if (math::dotVec3(normal, cam) > 0.0f) continue; // We are looking on the backside of the triangle, skip.
+            math::vec3 normal = transformed.getNormal();
+            math::vec3 cam(transformed.pos[0].x-pos.x, transformed.pos[0].y-pos.y, transformed.pos[0].z-pos.z);
+            if (math::dotVec3(normal, cam) > 0.0f) continue; // Back culling. Do not render triangles that have their back turned to the camera.
 
             for (auto i : { 0, 1, 2 }) {
-                math::vec3 v = projected.pos[i];
-
-                v = math::multMat4x4OnVec4(viewProjectionMatrix, v.toVec4(1)).dehomogenize();
-
-                v.x = (v.x + 1.0f) * width2;
-                v.y = (v.y + 1.0f) * height2;
-
-                float sim = (math::dotVec3(normal, scene.getAmbientLight())+ 1.0f) * 0.5f; // [-1; 1] -> w[0; 1]
-                if (sim < 0.1) sim = 0.1; // Minimum Lighting
-
-                projected.pos[i] = v;
-                projected.color[i].x *= sim;
-                projected.color[i].y *= sim;
-                projected.color[i].z *= sim;
+                transformed.pos[i] = math::multMat4x4OnVec4(scene.getCamera().viewMatrix, transformed.pos[i].toVec4(1)).dehomogenize();
             }
 
-            fillTriangle(projected);
-            drawTriangle(projected);
+            // Depth Clipping
+            modelling::Triangle t[2];
+            int newTriangles = modelling::clipTriangleByPlane(transformed, math::vec3(0.0f, 0.0f, 0.1f), math::vec3(0.0f, 0.0f, 1.0f), t[0], t[1]);
+
+            for (int i=0; i<newTriangles; i++) {
+                modelling::Triangle tri = t[i];
+                for (auto i : { 0, 1, 2 }) {
+                    math::vec3 v = tri.pos[i];
+
+                    v = math::multMat4x4OnVec4(projectionMatrix, v.toVec4(1)).dehomogenize();
+
+                    v.x = (v.x + 1.0f) * width2;
+                    v.y = (v.y + 1.0f) * height2;
+
+                    float sim = (math::dotVec3(normal, scene.getAmbientLight()) + 1.0f) * 0.5f; // [-1; 1] -> w[0; 1]
+                    if (sim < 0.1) sim = 0.1; // Minimum Lighting
+
+                    tri.pos[i] = v;
+                    tri.color[i].x *= sim;
+                    tri.color[i].y *= sim;
+                    tri.color[i].z *= sim;
+                }
+                depthClippedTriangles.push_back(tri);
+            }
+        }
+    }
+
+    for (modelling::Triangle& triangle : depthClippedTriangles) {
+        std::list<modelling::Triangle> trianglesToDraw;
+
+        modelling::Triangle t[2];
+
+        //*
+        trianglesToDraw.push_back(triangle);
+        int nNewTriangles = 1;
+
+        for (int p = 0; p < 4; p++) {
+            int nTrisToAdd = 0;
+            while (nNewTriangles > 0) {
+                modelling::Triangle candidate = trianglesToDraw.front();
+                trianglesToDraw.pop_front();
+                nNewTriangles--;
+
+                switch (p) {
+                    case 0: nTrisToAdd = modelling::clipTriangleByPlane(candidate, math::vec3(0.0f, 0.0f, 0.0f),                  math::vec3( 0.0f,  1.0f, 0.0f), t[0], t[1]); break;
+                    case 1: nTrisToAdd = modelling::clipTriangleByPlane(candidate, math::vec3(0.0f, display.getHeight()-1, 0.0f), math::vec3( 0.0f, -1.0f, 0.0f), t[0], t[1]); break;
+                    case 2: nTrisToAdd = modelling::clipTriangleByPlane(candidate, math::vec3(0.0f, 0.0f, 0.0f),                  math::vec3( 1.0f,  0.0f, 0.0f), t[0], t[1]); break;
+                    case 3: nTrisToAdd = modelling::clipTriangleByPlane(candidate, math::vec3(display.getWidth()-1, 0.0f, 0.0f),  math::vec3(-1.0f,  0.0f, 0.0f), t[0], t[1]); break;
+                }
+
+                for (int w=0; w<nTrisToAdd; w++) {
+                    trianglesToDraw.push_back(t[w]);
+                }
+            }
+            nNewTriangles = trianglesToDraw.size();
+        }
+        //*/
+        for (modelling::Triangle t : trianglesToDraw) {
+            fillTriangle(t);
+            //drawTriangle(t);
         }
     }
 }
@@ -153,7 +198,6 @@ void Rasterizer::fillTriangle(modelling::Triangle& t) {
     const math::vec3 c1 = t.getVertexColor(1);
     const math::vec3 c2 = t.getVertexColor(2);
 
-    // Flattened sort
     float minx = std::min({ v0.x, v1.x, v2.x });
     float miny = std::min({ v0.y, v1.y, v2.y });
     float maxx = std::max({ v0.x, v1.x, v2.x });

@@ -1,6 +1,7 @@
 #include "math.h"
 
 #include <cmath>
+#include <modelling/triangle.h>
 
 namespace math {
 
@@ -36,8 +37,8 @@ namespace math {
 
     mat3x3::mat3x3(const mat3x3& other) : a(other.a), b(other.b), c(other.c) {}
 
-    math::mat4x4 mat3x3::toMat4x4() {
-        return math::mat4x4(a.toVec4(0), b.toVec4(0), c.toVec4(0), math::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+    mat4x4 mat3x3::toMat4x4() {
+        return mat4x4(a.toVec4(0), b.toVec4(0), c.toVec4(0), vec4(0.0f, 0.0f, 0.0f, 1.0f));
     }
 
     mat4x4::mat4x4() : a(vec4()), b(vec4()), c(vec4()), d(vec4()) {}
@@ -54,16 +55,16 @@ namespace math {
         );
     }
 
-    vec3 normVec3(vec3& vec) {
+    vec3 normVec3(const vec3& vec) {
         float length = std::sqrt(vec.x*vec.x + vec.y*vec.y + vec.z*vec.z);
         return (length > 0.0f) ? vec3(vec.x/length, vec.y/length, vec.z/length) : vec3(0.0f, 0.0f, 0.0f);
     }
 
-    float dotVec3(vec3& vecA, vec3& vecB) {
+    float dotVec3(const vec3& vecA, const vec3& vecB) {
         return vecA.x * vecB.x + vecA.y * vecB.y + vecA.z * vecB.z;
     }
 
-    float dotVec4(vec4& vecA, vec4& vecB) {
+    float dotVec4(const vec4& vecA, const vec4& vecB) {
         return vecA.x * vecB.x + vecA.y * vecB.y + vecA.z * vecB.z + vecA.w * vecB.w;
     }
 
@@ -111,16 +112,16 @@ namespace math {
         );
     }
 
-    math::vec3 linInterpolVec3(float t, math::vec3& vecA, math::vec3& vecB) {
+    vec3 linInterpolVec3(float t, vec3& vecA, vec3& vecB) {
         float ti = 1 - t;
-        return math::vec3(
+        return vec3(
             vecA.x * t + vecB.x * ti,
             vecA.y * t + vecB.y * ti,
             vecA.z * t + vecB.z * ti
         );
     }
 
-    void barycentric(const math::vec3& v0, const math::vec3& v1, const math::vec3& v2, const math::vec3& p, float& l1, float& l2, float& l3) {
+    void barycentric(const vec3& v0, const vec3& v1, const vec3& v2, const vec3& p, float& l1, float& l2, float& l3) {
         double denom = (v1.y-v2.y) * (v0.x-v2.x) + (v2.x-v1.x) * (v0.y-v2.y);
 
         l1 = ((v1.y-v2.y) * (p.x-v2.x) + (v2.x-v1.x) * (p.y-v2.y)) / denom;
@@ -128,7 +129,7 @@ namespace math {
         l3 = 1.0 - l1 - l2;
     }
 
-    vec3 vectorPlaneIntersection(vec3& planePoint, vec3& planeNormal, vec3& lineStart, vec3& lineEnd) {
+    vec3 vectorPlaneIntersection(const vec3& planePoint, const vec3& planeNormal, const vec3& lineStart, const vec3& lineEnd) {
         vec3 normal = normVec3(planeNormal);
         float d = -dotVec3(planePoint, normal);
         float ad = dotVec3(lineStart, normal);

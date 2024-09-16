@@ -18,8 +18,8 @@ private:
 public:
     Scene(modelling::Camera& c, math::vec3& ambientLight);
 
-    void addObject(modelling::Mesh& mesh);
-    void addObject(modelling::Mesh& mesh, const std::vector<math::mat4x4>& modelTransformation);
+    void addObject(const modelling::Mesh& mesh);
+    void addObject(const modelling::Mesh& mesh, const std::vector<math::mat4x4>& modelTransformation);
 
     const std::vector<modelling::SceneObject>& getObjects();
     modelling::Camera& getCamera();

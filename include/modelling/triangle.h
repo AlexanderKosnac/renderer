@@ -16,6 +16,8 @@ namespace modelling {
         math::vec3 getNormal();
     };
 
+    int clipTriangleByPlane(modelling::Triangle& triangle, const math::vec3& planePos, const math::vec3& planeNormal, modelling::Triangle& out_tri1, modelling::Triangle& out_tri2);
+
 }
 
 #endif
