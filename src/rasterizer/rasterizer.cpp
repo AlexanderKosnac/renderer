@@ -56,8 +56,9 @@ void Rasterizer::render() {
                     v.x = (v.x + 1.0f) * width2;
                     v.y = (v.y + 1.0f) * height2;
 
-                    float sim = (math::dotVec3(normal, scene.getAmbientLight()) + 1.0f) * 0.5f; // [-1; 1] -> w[0; 1]
-                    if (sim < 0.1) sim = 0.1; // Minimum Lighting
+                    float min = 0.05;
+                    float val = math::dotVec3(normal, scene.getAmbientLight());
+                    float sim = min + ((val+1)/2) * (1 - min); // [-1; 1] -> [min; 1]
 
                     tri.pos[i] = v;
                     tri.color[i].x *= sim;
