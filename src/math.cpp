@@ -115,14 +115,14 @@ namespace math {
     vec3 linInterpolVec3(float t, const vec3& vecA, const vec3& vecB) {
         float ti = 1 - t;
         return vec3(
-            vecA.x * t + vecB.x * ti,
-            vecA.y * t + vecB.y * ti,
-            vecA.z * t + vecB.z * ti
+            vecA.x * ti + vecB.x * t,
+            vecA.y * ti + vecB.y * t,
+            vecA.z * ti + vecB.z * t
         );
     }
 
     float linInterpolFloat(const float& t, const float& a, const float& b) {
-        return a * t + b * (1 - t);
+        return a * (1 - t) + b * t;
     }
 
     void barycentric(const vec3& v0, const vec3& v1, const vec3& v2, const vec3& p, float& l1, float& l2, float& l3) {
