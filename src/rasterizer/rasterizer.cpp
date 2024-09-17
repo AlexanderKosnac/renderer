@@ -191,7 +191,7 @@ void Rasterizer::drawTriangle(modelling::Triangle& t) {
     drawLine(v2.x, v2.y, t.color[2], v0.x, v0.y, t.color[0]);
 }
 
-void Rasterizer::fillTriangle(modelling::Triangle& t) {
+void fillTriangleBarycentric(DisplayX11& display, modelling::Triangle& t) {
     const math::vec3 v0 = t.getVertexPos(0);
     const math::vec3 v1 = t.getVertexPos(1);
     const math::vec3 v2 = t.getVertexPos(2);
@@ -220,5 +220,76 @@ void Rasterizer::fillTriangle(modelling::Triangle& t) {
             }
         }
     }
+}
 
+void fillTriangleScanLine(DisplayX11& display, modelling::Triangle& t) {
+    math::vec3 c;
+    math::vec3 v0 = t.getVertexPos(0);
+    math::vec3 v1 = t.getVertexPos(1);
+    math::vec3 v2 = t.getVertexPos(2);
+    math::vec3 c0 = t.getVertexColor(0);
+    math::vec3 c1 = t.getVertexColor(1);
+    math::vec3 c2 = t.getVertexColor(2);
+
+    // Vertices sorted by Y
+    if (v1.y < v0.y) { std::swap(v0, v1); std::swap(c0, c1); }
+    if (v2.y < v0.y) { std::swap(v0, v2); std::swap(c0, c2); }
+    if (v2.y < v1.y) { std::swap(v1, v2); std::swap(c1, c2); }
+
+    float invSlope1 = 0, invSlope2 = 0;
+    if (v1.y-v0.y != 0) invSlope1 = (v1.x-v0.x)/(v1.y-v0.y);
+    if (v2.y-v0.y != 0) invSlope2 = (v2.x-v0.x)/(v2.y-v0.y);
+
+    // Top to middle
+    for (float y=v0.y; y<=v1.y; y++) {
+        float t1 = (y-v0.y)/(v1.y-v0.y);
+        float t2 = (y-v0.y)/(v2.y-v0.y);
+
+        float xStart = v0.x + (y-v0.y) * invSlope1;
+        float xEnd = v0.x + (y-v0.y) * invSlope2;
+        if (xStart > xEnd) std::swap(xStart, xEnd);
+
+        float zStart = math::linInterpolFloat(t1, v0.z, v1.z);
+        float zEnd = math::linInterpolFloat(t2, v0.z, v2.z);
+
+        math::vec3 colorStart = math::linInterpolVec3(t1, c0, c1);
+        math::vec3 colorEnd = math::linInterpolVec3(t2, c0, c2);
+
+        for (int x = static_cast<int>(xStart); x <= static_cast<int>(xEnd); x++) {
+            float t = (xEnd == xStart) ? 1.0f : (x-xStart)/(xEnd-xStart);
+            float z = math::linInterpolFloat(t, zStart, zEnd);
+            c = math::linInterpolVec3(t, colorStart, colorEnd);
+            display.setPixel(x, static_cast<int>(y), z, c);
+        }
+    }
+
+    if (v2.y-v1.y != 0) invSlope1 = (v2.x-v1.x)/(v2.y-v1.y);
+
+    // Middle to bottom
+    for (float y=v1.y; y<=v2.y; y++) {
+        float t1 = (y-v1.y)/(v2.y-v1.y);
+        float t2 = (y-v0.y)/(v2.y-v0.y);
+
+        float xStart = v1.x + (y-v1.y) * invSlope1;
+        float xEnd = v0.x + (y-v0.y) * invSlope2;
+        if (xStart > xEnd) std::swap(xStart, xEnd);
+
+        float zStart = math::linInterpolFloat(t1, v1.z, v2.z);
+        float zEnd = math::linInterpolFloat(t2, v0.z, v2.z);
+
+        math::vec3 colorStart = math::linInterpolVec3(t1, c1, c2);
+        math::vec3 colorEnd = math::linInterpolVec3(t2, c0, c2);
+
+        for (int x = static_cast<int>(xStart); x <= static_cast<int>(xEnd); x++) {
+            float t = (xEnd == xStart) ? 1.0f : (x-xStart)/(xEnd-xStart);
+            float z = math::linInterpolFloat(t, zStart, zEnd);
+            c = math::linInterpolVec3(t, colorStart, colorEnd);
+            display.setPixel(x, static_cast<int>(y), z, c);
+        }
+    }
+}
+
+void Rasterizer::fillTriangle(modelling::Triangle& t) {
+    //fillTriangleBarycentric(display, t);
+    fillTriangleScanLine(display, t);
 }

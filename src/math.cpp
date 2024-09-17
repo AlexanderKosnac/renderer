@@ -121,6 +121,10 @@ namespace math {
         );
     }
 
+    float linInterpolFloat(const float& t, const float& a, const float& b) {
+        return a * t + b * (1 - t);
+    }
+
     void barycentric(const vec3& v0, const vec3& v1, const vec3& v2, const vec3& p, float& l1, float& l2, float& l3) {
         double denom = (v1.y-v2.y) * (v0.x-v2.x) + (v2.x-v1.x) * (v0.y-v2.y);
 

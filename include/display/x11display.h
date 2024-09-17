@@ -37,7 +37,7 @@ public:
 
     void handleEvent(XEvent &event);
     void update();
-    void setPixel(int x, int y, float z, math::vec3& color);
+    void setPixel(int x, int y, float z, const math::vec3& color);
     void clear();
     void clearZBuffer();
 };

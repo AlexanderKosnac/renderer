@@ -60,9 +60,7 @@ void DisplayX11::setWindowTitle(const std::string& s) {
 
 void DisplayX11::handleEvent(XEvent& event) {
     CallbackType cbt = eventMapping[event.type];
-    if (!cbt) {
-        return;
-    }
+    if (!cbt) return;
 
     for (const auto& callback : listeners[cbt]) {
         callback(event);
@@ -81,7 +79,7 @@ void DisplayX11::update() {
     handleEvent(event);
 }
 
-void DisplayX11::setPixel(int x, int y, float z, math::vec3& color) {
+void DisplayX11::setPixel(int x, int y, float z, const math::vec3& color) {
     if (x < 0 || y < 0 || x >= width || y >= height) return;
     int i = y * width + x;
     if (zbuffer[i] > z) return;
