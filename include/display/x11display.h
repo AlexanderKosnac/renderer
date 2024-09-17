@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 #include <functional>
+#include <string>
 
 #include <X11/Xlib.h>
 
@@ -31,6 +32,8 @@ public:
 
     float getWidth();
     float getHeight();
+
+    void setWindowTitle(const std::string& s);
 
     void handleEvent(XEvent &event);
     void update();

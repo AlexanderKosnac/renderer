@@ -54,6 +54,10 @@ float DisplayX11::getHeight() {
     return height;
 }
 
+void DisplayX11::setWindowTitle(const std::string& s) {
+    XStoreName(display, window, s.c_str());
+}
+
 void DisplayX11::handleEvent(XEvent& event) {
     CallbackType cbt = eventMapping[event.type];
     if (!cbt) {
