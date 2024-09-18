@@ -54,7 +54,8 @@ int main(int argc, char* argv[]) {
                 transformation::translate(0.0f, -2.0f, 20.0f),
             });
         } else {
-            printf("Unknown scene '%s'. Check available scenes again.", select.c_str());
+            fprintf(stderr, "Unknown scene '%s'. Check available scenes.\n", select.c_str());
+            return 1;
         }
     } else {
         // Default scene is the Utah Teapot
