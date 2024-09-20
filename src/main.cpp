@@ -26,6 +26,12 @@ int main(int argc, char* argv[]) {
     if (argc > 1) {
         std::string select = argv[1];
         if (select == "cube") {
+        } else if (select == "axis") {
+            scene.addObject(modelling::Mesh("objs/axis.obj"), {
+                transformation::translate(0.0f, 0.0f, 0.0f),
+            });
+        } else if (select == "axis") {
+            scene.addObject(modelling::Mesh("objs/axis.obj"), {});
             scene.addObject(modelling::Mesh("objs/cube.obj"), {
                 transformation::rotationY(30.0f).toMat4x4(),
                 transformation::rotationX(30.0f).toMat4x4(),

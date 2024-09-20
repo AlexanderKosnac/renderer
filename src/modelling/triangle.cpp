@@ -69,6 +69,7 @@ namespace modelling {
 
         if (inCount == 1 && outCount == 2) { // Triangle "legs" outside
             float t0, t1;
+
             out_tri1.pos[0] = *inPoints[0];
             out_tri1.pos[1] = math::vectorPlaneIntersection(planePos, normal, *inPoints[0], *outPoints[0], t0);
             out_tri1.pos[2] = math::vectorPlaneIntersection(planePos, normal, *inPoints[0], *outPoints[1], t1);
