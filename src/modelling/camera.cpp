@@ -46,13 +46,14 @@ namespace modelling {
     }
 
     void Camera::setProjectionMatrix(math::mat4x4& target) {
-        float invTanFov = 1/tan(math::asRadians(fov)/2);
+        float invTanFov = 1.0f/tan(math::asRadians(fov/2.0f));
 
+        // Symmetrical Perspective Projection
         target.a.x = invTanFov/aspect;
         target.b.y = invTanFov;
         target.c.z = (far+near)/(near-far);
-        target.c.w = (2*far*near)/(near-far);
-        target.d.z = -1.0f;
+        target.c.w = -1.0f;
+        target.d.z = (2.0f*far*near)/(near-far);;
     }
 
     math::vec3& Camera::getPos() {
