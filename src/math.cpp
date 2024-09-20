@@ -137,7 +137,7 @@ namespace math {
         float d = -dotVec3(planePoint, normal);
         float ad = dotVec3(lineStart, normal);
         float bd = dotVec3(lineEnd, normal);
-        t = (-d - ad) / (bd - ad);
+        t = (-d-ad)/(bd-ad);
         return vec3(
             (lineEnd.x - lineStart.x) * t + lineStart.x,
             (lineEnd.y - lineStart.y) * t + lineStart.y,

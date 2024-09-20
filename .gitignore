@@ -1,4 +1,5 @@
 renderer
+runUnitTests
 
 *.o
 

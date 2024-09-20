@@ -102,6 +102,8 @@ namespace modelling {
 
             return 2;
         }
+
+        return -1; // Can not happen
     }
 
 }
