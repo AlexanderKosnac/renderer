@@ -38,7 +38,16 @@ void Rasterizer::render() {
             math::vec3 cam(transformed.pos[0].x-pos.x, transformed.pos[0].y-pos.y, transformed.pos[0].z-pos.z);
             if (math::dotVec3(normal, cam) > 0.0f) continue; // Back culling. Do not render triangles that have their back turned to the camera.
 
+            // Calculate ambient lighting intensity
+            float min = 0.05;
+            float val = -math::dotVec3(normal, scene.getAmbientLight());
+            float sim = min + ((val+1.0f)/2.0f) * (1.0f-min); // [-1; 1] -> [min; 1]
+
             for (auto i : { 0, 1, 2 }) {
+                transformed.color[i].x *= sim;
+                transformed.color[i].y *= sim;
+                transformed.color[i].z *= sim;
+
                 transformed.pos[i] = math::multMat4x4OnVec4(scene.getCamera().viewMatrix, transformed.pos[i].toVec4(1)).dehomogenize();
             }
 
@@ -51,14 +60,6 @@ void Rasterizer::render() {
                 for (auto i : { 0, 1, 2 }) {
                     tri.pos[i] = math::multMat4x4OnVec4(projectionMatrix, tri.pos[i].toVec4(1)).dehomogenize();
 
-                    float min = 0.05;
-                    float val = math::dotVec3(normal, scene.getAmbientLight());
-                    float sim = min + ((val+1)/2) * (1 - min); // [-1; 1] -> [min; 1]
-
-                    tri.pos[i] = v;
-                    tri.color[i].x *= sim;
-                    tri.color[i].y *= sim;
-                    tri.color[i].z *= sim;
                     tri.pos[i].x = (-tri.pos[i].x + 1.0f) * width2;
                     tri.pos[i].y = (-tri.pos[i].y + 1.0f) * height2;
                 }
