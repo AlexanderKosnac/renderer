@@ -18,6 +18,7 @@ Then call the binary either alone, or with a single parameter to define a specif
 ```
 
 Available scene-identifiers:
+- `triangle`
 - `axis`
 - `cube`
 - `d20`

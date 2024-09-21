@@ -29,6 +29,9 @@ int main(int argc, char* argv[]) {
         } else if (select == "axis") {
             scene.addObject(modelling::Mesh("objs/axis.obj"), {
                 transformation::translate(0.0f, 0.0f, 0.0f),
+        if (select == "triangle") {
+            scene.addObject(modelling::Mesh("objs/triangle.obj"), {
+                transformation::translate(0.0f, 0.0f, -3.0f),
             });
         } else if (select == "axis") {
             scene.addObject(modelling::Mesh("objs/axis.obj"), {});
