@@ -18,10 +18,25 @@ Then call the binary either alone, or with a single parameter to define a specif
 ```
 
 Available scene-identifiers:
-- `triangle`
 - `axis`
 - `cube`
 - `d20`
 - `kokiri`
 - `psyduck`
 - `teapot`
+- `triangle`
+
+You can compile and run some tests with the `test` target:
+
+```bash
+make test
+```
+
+
+## State of the Implementation
+
+As of now, basic `.obj` files can be read and rendered.
+This means only comments (`#`), vertices (`v`), and faces (`f`) are properly processed.
+See the files included in this repository as examples.
+There is no support for textures.
+Texture coordinates and faces referencing them are not properly read, **do not** include them!

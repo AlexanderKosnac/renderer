@@ -78,7 +78,7 @@ int main(int argc, char* argv[]) {
 
     auto onKeyPress = [&camera](XEvent& event) mutable {
         math::vec3& pos = camera.getPos();
-        float m = 1.5;
+        float m = 1.0f;
         float degree = 1.0f;
         switch (event.xkey.keycode) {
             case 25: // W
