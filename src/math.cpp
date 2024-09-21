@@ -86,29 +86,28 @@ namespace math {
     }
 
     mat3x3 multMat3x3OnMat3x3(mat3x3 matA, mat3x3 matB) {
+        vec3 row1(matA.a.x, matA.b.x, matA.c.x);
+        vec3 row2(matA.a.y, matA.b.y, matA.c.y);
+        vec3 row3(matA.a.z, matA.b.z, matA.c.z);
+
         return mat3x3(
-            multMat3x3OnVec3(matA, vec3(matB.a.x, matB.b.x, matB.c.x)),
-            multMat3x3OnVec3(matA, vec3(matB.a.y, matB.b.y, matB.c.y)),
-            multMat3x3OnVec3(matA, vec3(matB.a.z, matB.b.z, matB.c.z))
+            vec3(dotVec3(row1, matB.a), dotVec3(row2, matB.a), dotVec3(row3, matB.a)),
+            vec3(dotVec3(row1, matB.b), dotVec3(row2, matB.b), dotVec3(row3, matB.b)),
+            vec3(dotVec3(row1, matB.c), dotVec3(row2, matB.c), dotVec3(row3, matB.c))
         );
     }
 
     mat4x4 multMat4x4OnMat4x4(mat4x4 matA, mat4x4 matB) {
-        vec4 r1 = vec4(matA.a.x, matA.b.x, matA.c.x, matA.d.x);
-        vec4 r2 = vec4(matA.a.y, matA.b.y, matA.c.y, matA.d.y);
-        vec4 r3 = vec4(matA.a.z, matA.b.z, matA.c.z, matA.d.z);
-        vec4 r4 = vec4(matA.a.w, matA.b.w, matA.c.w, matA.d.w);
-
-        vec4 c1 = matB.a;
-        vec4 c2 = matB.b;
-        vec4 c3 = matB.c;
-        vec4 c4 = matB.d;
+        vec4 row1(matA.a.x, matA.b.x, matA.c.x, matA.d.x);
+        vec4 row2(matA.a.y, matA.b.y, matA.c.y, matA.d.y);
+        vec4 row3(matA.a.z, matA.b.z, matA.c.z, matA.d.z);
+        vec4 row4(matA.a.w, matA.b.w, matA.c.w, matA.d.w);
 
         return mat4x4(
-            vec4(dotVec4(r1, c1), dotVec4(r2, c1), dotVec4(r3, c1), dotVec4(r4, c1)),
-            vec4(dotVec4(r1, c2), dotVec4(r2, c2), dotVec4(r3, c2), dotVec4(r4, c2)),
-            vec4(dotVec4(r1, c3), dotVec4(r2, c3), dotVec4(r3, c3), dotVec4(r4, c3)),
-            vec4(dotVec4(r1, c4), dotVec4(r2, c4), dotVec4(r3, c4), dotVec4(r4, c4))
+            vec4(dotVec4(row1, matB.a), dotVec4(row2, matB.a), dotVec4(row3, matB.a), dotVec4(row4, matB.a)),
+            vec4(dotVec4(row1, matB.b), dotVec4(row2, matB.b), dotVec4(row3, matB.b), dotVec4(row4, matB.b)),
+            vec4(dotVec4(row1, matB.c), dotVec4(row2, matB.c), dotVec4(row3, matB.c), dotVec4(row4, matB.c)),
+            vec4(dotVec4(row1, matB.d), dotVec4(row2, matB.d), dotVec4(row3, matB.d), dotVec4(row4, matB.d))
         );
     }
 
