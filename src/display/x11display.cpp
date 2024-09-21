@@ -82,7 +82,7 @@ void DisplayX11::update() {
 void DisplayX11::setPixel(int x, int y, float z, const math::vec3& color) {
     if (x < 0 || y < 0 || x >= width || y >= height) return;
     int i = y * width + x;
-    if (zbuffer[i] > z) return;
+    if (z > zbuffer[i]) return; // Smaller z means closer to the camera.
     zbuffer[i] = z;
     int ii = i * 4;
     image[ii+0] = color.z;
@@ -101,6 +101,6 @@ void DisplayX11::clear() {
 void DisplayX11::clearZBuffer() {
     const int m = width*height;
     for (int i=0; i<m; ++i) {
-        zbuffer[i] = FLT_MIN;
+        zbuffer[i] = 1.0f;
     }
 }

@@ -49,12 +49,7 @@ void Rasterizer::render() {
             for (int i=0; i<newTriangles; i++) {
                 modelling::Triangle tri = t[i];
                 for (auto i : { 0, 1, 2 }) {
-                    math::vec3 v = tri.pos[i];
-
-                    v = math::multMat4x4OnVec4(projectionMatrix, v.toVec4(1)).dehomogenize();
-
-                    v.x = (v.x + 1.0f) * width2;
-                    v.y = (v.y + 1.0f) * height2;
+                    tri.pos[i] = math::multMat4x4OnVec4(projectionMatrix, tri.pos[i].toVec4(1)).dehomogenize();
 
                     float min = 0.05;
                     float val = math::dotVec3(normal, scene.getAmbientLight());
@@ -64,6 +59,8 @@ void Rasterizer::render() {
                     tri.color[i].x *= sim;
                     tri.color[i].y *= sim;
                     tri.color[i].z *= sim;
+                    tri.pos[i].x = (-tri.pos[i].x + 1.0f) * width2;
+                    tri.pos[i].y = (-tri.pos[i].y + 1.0f) * height2;
                 }
                 depthClippedTriangles.push_back(tri);
             }
@@ -75,11 +72,10 @@ void Rasterizer::render() {
 
         modelling::Triangle t[2];
 
-        //*
         trianglesToDraw.push_back(triangle);
         int nNewTriangles = 1;
 
-        for (int p = 0; p < 4; p++) {
+        for (int p=0; p<4; p++) {
             int nTrisToAdd = 0;
             while (nNewTriangles > 0) {
                 modelling::Triangle candidate = trianglesToDraw.front();
@@ -99,10 +95,10 @@ void Rasterizer::render() {
             }
             nNewTriangles = trianglesToDraw.size();
         }
-        //*/
-        for (modelling::Triangle t : trianglesToDraw) {
+
+        for (modelling::Triangle& t : trianglesToDraw) {
             fillTriangle(t);
-            //drawTriangle(t);
+            //drawTriangle(t); // Draw wireframe of scene
         }
     }
 }
@@ -112,6 +108,8 @@ void Rasterizer::updateProjectionMatrix() {
 }
 
 void Rasterizer::drawLine(float x1, float y1, math::vec3& color1, float x2, float y2, math::vec3& color2) {
+    const float LINE_Z = 0.0f;
+
     int x, y, xe, ye;
     int dx = x2 - x1;
     int dy = y2 - y1;
@@ -137,7 +135,7 @@ void Rasterizer::drawLine(float x1, float y1, math::vec3& color1, float x2, floa
             colorB = color1;
         }
 
-        display.setPixel(x, y, 0, colorB);
+        display.setPixel(x, y, LINE_Z, colorB);
 
         for (int i=0; x<xe; i++) {
             x += 1;
@@ -148,7 +146,7 @@ void Rasterizer::drawLine(float x1, float y1, math::vec3& color1, float x2, floa
                 px = px + 2 * (dy1 - dx1);
             }
             math::vec3 color = math::linInterpolVec3((float)i/(float)dx1, colorA, colorB);
-            display.setPixel(x, y, 0, color);
+            display.setPixel(x, y, LINE_Z, color);
         }
     } else {
         if (dy < 0) {
@@ -165,7 +163,7 @@ void Rasterizer::drawLine(float x1, float y1, math::vec3& color1, float x2, floa
             colorB = color1;
         }
 
-        display.setPixel(x, y, 0, colorB);
+        display.setPixel(x, y, LINE_Z, colorB);
 
         for (int i=0; y<ye; i++) {
             y += 1;
@@ -176,7 +174,7 @@ void Rasterizer::drawLine(float x1, float y1, math::vec3& color1, float x2, floa
                 py = py + 2 * dx1;
             }
             math::vec3 color = math::linInterpolVec3((float)i/(float)dy1, colorA, colorB);
-            display.setPixel(x, y, 0, color);
+            display.setPixel(x, y, LINE_Z, color);
         }
     }
 }

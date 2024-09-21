@@ -17,50 +17,46 @@
 #include "display/callbacktypes.h"
 
 int main(int argc, char* argv[]) {
-    modelling::Camera cam(90.0f, 4.0/3.0, 0.1f, 1000.0f, math::vec3(0.0f, 0.0f, 0.0f), math::vec3(0.0f, 1.0f, 0.0f), math::vec3(0.0f, 0.0f, -1.0f));
+    modelling::Camera cam(60.0f, 4.0/3.0, 0.1f, 1000.0f, math::vec3(0.0f, 0.0f, 0.0f), math::vec3(0.0f, 1.0f, 0.0f), math::vec3(0.0f, 0.0f, 1.0f));
 
-    math::vec3 light(0.0f, 1.0f, 0.0f);
+    math::vec3 light(0.0f, -1.0f, 0.0f);
 
     Scene scene(cam, light);
 
     if (argc > 1) {
         std::string select = argv[1];
-        if (select == "cube") {
-        } else if (select == "axis") {
-            scene.addObject(modelling::Mesh("objs/axis.obj"), {
-                transformation::translate(0.0f, 0.0f, 0.0f),
         if (select == "triangle") {
             scene.addObject(modelling::Mesh("objs/triangle.obj"), {
                 transformation::translate(0.0f, 0.0f, -3.0f),
             });
         } else if (select == "axis") {
             scene.addObject(modelling::Mesh("objs/axis.obj"), {});
+        } else if (select == "cube") {
             scene.addObject(modelling::Mesh("objs/cube.obj"), {
                 transformation::rotationY(30.0f).toMat4x4(),
                 transformation::rotationX(30.0f).toMat4x4(),
-                transformation::translate(0.0f, 0.0f, 10.0f),
+                transformation::translate(0.0f, 0.0f, -3.0f),
             });
         } else if (select == "d20") {
             scene.addObject(modelling::Mesh("objs/d20.obj"), {
                 transformation::scale(2.0f).toMat4x4(),
                 transformation::rotationX(10.0f).toMat4x4(),
-                transformation::translate(0.0f, 0.0f, 20.0f),
+                transformation::translate(0.0f, 0.0f, -20.0f),
             });
         } else if (select == "kokiri") {
             scene.addObject(modelling::Mesh("objs/kokiri.obj"), {
                 transformation::scale(0.1f).toMat4x4(),
                 transformation::rotationY(165.0f).toMat4x4(),
-                transformation::translate(0.0f, -50.0f, 20.0f),
+                transformation::translate(0.0f, -50.0f, -20.0f),
             });
         } else if (select == "psyduck") {
             scene.addObject(modelling::Mesh("objs/psyduck.obj"), {
                 transformation::scale(0.01f).toMat4x4(),
-                transformation::rotationY(180.0f).toMat4x4(),
-                transformation::translate(0.0f, -2.0f, 20.0f),
+                transformation::translate(0.0f, -2.0f, -10.0f),
             });
         } else if (select == "teapot") {
             scene.addObject(modelling::Mesh("objs/teapot.obj"), {
-                transformation::translate(0.0f, -2.0f, 20.0f),
+                transformation::translate(0.0f, -2.0f, -5.0f),
             });
         } else {
             fprintf(stderr, "Unknown scene '%s'. Check available scenes.\n", select.c_str());
@@ -69,7 +65,7 @@ int main(int argc, char* argv[]) {
     } else {
         // Default scene is the Utah Teapot
         scene.addObject(modelling::Mesh("objs/teapot.obj"), {
-            transformation::translate(0.0f, -2.0f, 20.0f),
+            transformation::translate(0.0f, -2.0f, -5.0f),
         });
     }
 
