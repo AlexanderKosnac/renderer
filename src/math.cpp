@@ -68,7 +68,7 @@ namespace math {
         return vecA.x * vecB.x + vecA.y * vecB.y + vecA.z * vecB.z + vecA.w * vecB.w;
     }
 
-    vec3 multMat3x3OnVec3(mat3x3 mat, vec3 vec) {
+    vec3 multMat3x3OnVec3(const mat3x3& mat, const vec3& vec) {
         return vec3(
             mat.a.x * vec.x + mat.b.x * vec.y + mat.c.x * vec.z,
             mat.a.y * vec.x + mat.b.y * vec.y + mat.c.y * vec.z,
@@ -76,7 +76,7 @@ namespace math {
         );
     }
 
-    vec4 multMat4x4OnVec4(mat4x4 mat, vec4 vec) {
+    vec4 multMat4x4OnVec4(const mat4x4& mat, const vec4& vec) {
         return vec4(
             mat.a.x * vec.x + mat.b.x * vec.y + mat.c.x * vec.z + mat.d.x * vec.w,
             mat.a.y * vec.x + mat.b.y * vec.y + mat.c.y * vec.z + mat.d.y * vec.w,
@@ -85,7 +85,7 @@ namespace math {
         );
     }
 
-    mat3x3 multMat3x3OnMat3x3(mat3x3 matA, mat3x3 matB) {
+    mat3x3 multMat3x3OnMat3x3(const mat3x3& matA, const mat3x3& matB) {
         vec3 row1(matA.a.x, matA.b.x, matA.c.x);
         vec3 row2(matA.a.y, matA.b.y, matA.c.y);
         vec3 row3(matA.a.z, matA.b.z, matA.c.z);
@@ -97,7 +97,7 @@ namespace math {
         );
     }
 
-    mat4x4 multMat4x4OnMat4x4(mat4x4 matA, mat4x4 matB) {
+    mat4x4 multMat4x4OnMat4x4(const mat4x4& matA, const mat4x4& matB) {
         vec4 row1(matA.a.x, matA.b.x, matA.c.x, matA.d.x);
         vec4 row2(matA.a.y, matA.b.y, matA.c.y, matA.d.y);
         vec4 row3(matA.a.z, matA.b.z, matA.c.z, matA.d.z);

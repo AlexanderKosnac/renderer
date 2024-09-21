@@ -27,7 +27,7 @@ void Rasterizer::render() {
             for (auto i : { 0, 1, 2 }) {
                 math::vec4 v = triangle.getVertexPos(i).toVec4(1);
                 // Apply model to world coordinate transformations here
-                for (auto transformation : object.modelTransformations) {
+                for (auto& transformation : object.modelTransformations) {
                     v = math::multMat4x4OnVec4(transformation, v);
                 }
                 transformed.pos[i] = v.toVec3();
