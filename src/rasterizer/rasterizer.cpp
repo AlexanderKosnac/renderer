@@ -25,13 +25,13 @@ void Rasterizer::render() {
         for (auto triangle : object.mesh.getTriangles()) {
             modelling::Triangle transformed;
             for (auto i : { 0, 1, 2 }) {
-                math::vec4 v = triangle.getVertexPos(i).toVec4(1);
+                math::vec4 v = triangle.pos[i].toVec4(1);
                 // Apply model to world coordinate transformations here
                 for (auto& transformation : object.modelTransformations) {
                     v = math::multMat4x4OnVec4(transformation, v);
                 }
                 transformed.pos[i] = v.toVec3();
-                transformed.color[i] = triangle.getVertexColor(i);
+                transformed.color[i] = triangle.color[i];
             }
 
             math::vec3 normal = transformed.getNormal();
@@ -181,9 +181,9 @@ void Rasterizer::drawLine(float x1, float y1, math::vec3& color1, float x2, floa
 }
 
 void Rasterizer::drawTriangle(modelling::Triangle& t) {
-    math::vec3& v0 = t.getVertexPos(0);
-    math::vec3& v1 = t.getVertexPos(1);
-    math::vec3& v2 = t.getVertexPos(2);
+    math::vec3& v0 = t.pos[0];
+    math::vec3& v1 = t.pos[1];
+    math::vec3& v2 = t.pos[2];
 
     drawLine(v0.x, v0.y, t.color[0], v1.x, v1.y, t.color[1]);
     drawLine(v1.x, v1.y, t.color[1], v2.x, v2.y, t.color[2]);
@@ -191,12 +191,12 @@ void Rasterizer::drawTriangle(modelling::Triangle& t) {
 }
 
 void fillTriangleBarycentric(DisplayX11& display, modelling::Triangle& t) {
-    const math::vec3 v0 = t.getVertexPos(0);
-    const math::vec3 v1 = t.getVertexPos(1);
-    const math::vec3 v2 = t.getVertexPos(2);
-    const math::vec3 c0 = t.getVertexColor(0);
-    const math::vec3 c1 = t.getVertexColor(1);
-    const math::vec3 c2 = t.getVertexColor(2);
+    const math::vec3 v0 = t.pos[0];
+    const math::vec3 v1 = t.pos[1];
+    const math::vec3 v2 = t.pos[2];
+    const math::vec3 c0 = t.color[0];
+    const math::vec3 c1 = t.color[1];
+    const math::vec3 c2 = t.color[2];
 
     float minx = std::min({ v0.x, v1.x, v2.x });
     float miny = std::min({ v0.y, v1.y, v2.y });
@@ -223,12 +223,12 @@ void fillTriangleBarycentric(DisplayX11& display, modelling::Triangle& t) {
 
 void fillTriangleScanLine(DisplayX11& display, modelling::Triangle& t) {
     math::vec3 c;
-    math::vec3 v0 = t.getVertexPos(0);
-    math::vec3 v1 = t.getVertexPos(1);
-    math::vec3 v2 = t.getVertexPos(2);
-    math::vec3 c0 = t.getVertexColor(0);
-    math::vec3 c1 = t.getVertexColor(1);
-    math::vec3 c2 = t.getVertexColor(2);
+    math::vec3 v0 = t.pos[0];
+    math::vec3 v1 = t.pos[1];
+    math::vec3 v2 = t.pos[2];
+    math::vec3 c0 = t.color[0];
+    math::vec3 c1 = t.color[1];
+    math::vec3 c2 = t.color[2];
 
     // Vertices sorted by Y
     if (v1.y < v0.y) { std::swap(v0, v1); std::swap(c0, c1); }

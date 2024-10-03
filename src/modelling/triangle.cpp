@@ -9,14 +9,6 @@ namespace modelling {
         color[i] = pColor;
     }
 
-    math::vec3& Triangle::getVertexPos(int i) {
-        return pos[i];
-    }
-
-    math::vec3& Triangle::getVertexColor(int i) {
-        return color[i];
-    }
-
     math::vec3 Triangle::getNormal() {
         math::vec3 l1(
             pos[1].x - pos[0].x,
