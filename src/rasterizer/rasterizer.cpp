@@ -21,12 +21,14 @@ void Rasterizer::render() {
 
     std::vector<modelling::Triangle> depthClippedTriangles;
 
+    // Render all objects in the scene.
     for (auto object : scene.getObjects()) {
+        // For each object, each triangle has to be rendered.
         for (auto triangle : object.mesh.getTriangles()) {
             modelling::Triangle transformed;
             for (auto i : { 0, 1, 2 }) {
                 math::vec4 v = triangle.pos[i].toVec4(1);
-                // Apply model to world coordinate transformations here
+                // Transform each vertex from model to world coordinates by applying all transformation of the object.
                 for (auto& transformation : object.modelTransformations) {
                     v = math::multMat4x4OnVec4(transformation, v);
                 }
@@ -35,10 +37,12 @@ void Rasterizer::render() {
             }
 
             math::vec3 normal = transformed.getNormal();
-            math::vec3 cam(transformed.pos[0].x-pos.x, transformed.pos[0].y-pos.y, transformed.pos[0].z-pos.z);
-            if (math::dotVec3(normal, cam) > 0.0f) continue; // Back culling. Do not render triangles that have their back turned to the camera.
 
-            // Calculate ambient lighting intensity
+            // Back culling - do not render triangles that have their back turned to the camera.
+            math::vec3 cam(transformed.pos[0].x-pos.x, transformed.pos[0].y-pos.y, transformed.pos[0].z-pos.z);
+            if (math::dotVec3(normal, cam) > 0.0f) continue;
+
+            // Calculate ambient lighting intensity based on the angle of the normal to the light direction.
             float min = 0.05;
             float val = -math::dotVec3(normal, scene.getAmbientLight());
             float sim = min + ((val+1.0f)/2.0f) * (1.0f-min); // [-1; 1] -> [min; 1]
@@ -51,15 +55,22 @@ void Rasterizer::render() {
                 transformed.pos[i] = math::multMat4x4OnVec4(scene.getCamera().viewMatrix, transformed.pos[i].toVec4(1)).dehomogenize();
             }
 
-            // Depth Clipping
+            // Depth Clipping - clip triangles by the near plane.
+            // Triangles that are very close to the camera, become very large causing performance issues. Because of
+            // this they are clipped.
             modelling::Triangle t[2];
             int newTriangles = modelling::clipTriangleByPlane(transformed, math::vec3(0.0f, 0.0f, 0.1f), math::vec3(0.0f, 0.0f, 1.0f), t[0], t[1]);
 
+            // The result of the clipping is not the original triangle, but potentially up to two subtriangles, making
+            // up the original triangle. The following loop handles each of these triangles.
             for (int i=0; i<newTriangles; i++) {
                 modelling::Triangle tri = t[i];
                 for (auto i : { 0, 1, 2 }) {
+                    // Apply projection, transforming every point to be within a [-1; 1] frustum.
                     tri.pos[i] = math::multMat4x4OnVec4(projectionMatrix, tri.pos[i].toVec4(1)).dehomogenize();
 
+                    // Stretch x and y part to match window size (results are discreet pixel coordinates).
+                    // This turns it into a space of [0; screen width], [0; screen height]; [0; 1].
                     tri.pos[i].x = (-tri.pos[i].x + 1.0f) * width2;
                     tri.pos[i].y = (-tri.pos[i].y + 1.0f) * height2;
                 }
@@ -68,6 +79,8 @@ void Rasterizer::render() {
         }
     }
 
+    // For each triangle the discreet pixel coordinates on the screen are now known and it is ready to draw. Before
+    // that, each triangle has to be clipped along all four edges of the screen.
     for (modelling::Triangle& triangle : depthClippedTriangles) {
         std::list<modelling::Triangle> trianglesToDraw;
 
@@ -76,6 +89,7 @@ void Rasterizer::render() {
         trianglesToDraw.push_back(triangle);
         int nNewTriangles = 1;
 
+        // Clip along each screen edge.
         for (int p=0; p<4; p++) {
             int nTrisToAdd = 0;
             while (nNewTriangles > 0) {
@@ -84,12 +98,13 @@ void Rasterizer::render() {
                 nNewTriangles--;
 
                 switch (p) {
-                    case 0: nTrisToAdd = modelling::clipTriangleByPlane(candidate, math::vec3(0.0f, 0.0f, 0.0f),                  math::vec3( 0.0f,  1.0f, 0.0f), t[0], t[1]); break;
-                    case 1: nTrisToAdd = modelling::clipTriangleByPlane(candidate, math::vec3(0.0f, display.getHeight()-1, 0.0f), math::vec3( 0.0f, -1.0f, 0.0f), t[0], t[1]); break;
-                    case 2: nTrisToAdd = modelling::clipTriangleByPlane(candidate, math::vec3(0.0f, 0.0f, 0.0f),                  math::vec3( 1.0f,  0.0f, 0.0f), t[0], t[1]); break;
-                    case 3: nTrisToAdd = modelling::clipTriangleByPlane(candidate, math::vec3(display.getWidth()-1, 0.0f, 0.0f),  math::vec3(-1.0f,  0.0f, 0.0f), t[0], t[1]); break;
+                    case 0: nTrisToAdd = modelling::clipTriangleByPlane(candidate, math::vec3(0.0f, 0.0f, 0.0f),                  math::vec3( 0.0f,  1.0f, 0.0f), t[0], t[1]); break; // Right
+                    case 1: nTrisToAdd = modelling::clipTriangleByPlane(candidate, math::vec3(0.0f, display.getHeight()-1, 0.0f), math::vec3( 0.0f, -1.0f, 0.0f), t[0], t[1]); break; // Top
+                    case 2: nTrisToAdd = modelling::clipTriangleByPlane(candidate, math::vec3(0.0f, 0.0f, 0.0f),                  math::vec3( 1.0f,  0.0f, 0.0f), t[0], t[1]); break; // Left
+                    case 3: nTrisToAdd = modelling::clipTriangleByPlane(candidate, math::vec3(display.getWidth()-1, 0.0f, 0.0f),  math::vec3(-1.0f,  0.0f, 0.0f), t[0], t[1]); break; // Bottom
                 }
 
+                // Store sub triangles created by clipping process.
                 for (int w=0; w<nTrisToAdd; w++) {
                     trianglesToDraw.push_back(t[w]);
                 }
@@ -97,6 +112,7 @@ void Rasterizer::render() {
             nNewTriangles = trianglesToDraw.size();
         }
 
+        // Triangle vertices are now all within the screen and can be drawn by applying 2D rasterization between them.
         for (modelling::Triangle& t : trianglesToDraw) {
             fillTriangle(t);
             //drawTriangle(t); // Draw wireframe of scene
