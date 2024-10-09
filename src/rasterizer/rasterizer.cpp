@@ -124,6 +124,9 @@ void Rasterizer::updateProjectionMatrix() {
     scene.getCamera().setProjectionMatrix(projectionMatrix);
 }
 
+/*
+ * Draws a line between two 2D points. Uses Bresenham's line algorithm.
+ */
 void Rasterizer::drawLine(float x1, float y1, math::vec3& color1, float x2, float y2, math::vec3& color2) {
     const float LINE_Z = 0.0f;
 
@@ -196,6 +199,9 @@ void Rasterizer::drawLine(float x1, float y1, math::vec3& color1, float x2, floa
     }
 }
 
+/*
+ * Draws a triangle wire frame by simply drawing three lines to connect the vertices.
+ */
 void Rasterizer::drawTriangle(modelling::Triangle& t) {
     math::vec3& v0 = t.pos[0];
     math::vec3& v1 = t.pos[1];
@@ -206,6 +212,12 @@ void Rasterizer::drawTriangle(modelling::Triangle& t) {
     drawLine(v2.x, v2.y, t.color[2], v0.x, v0.y, t.color[0]);
 }
 
+/*
+ * Triangle rasterization using barycentric coordinates.
+ * For this, the barycentric coordinates are calculated for all pixels within a box around the triangle and used to
+ * determine whether or not the pixel is located within the triangle.
+ * Relyable but expensive implementation.
+ */
 void fillTriangleBarycentric(DisplayX11& display, modelling::Triangle& t) {
     const math::vec3 v0 = t.pos[0];
     const math::vec3 v1 = t.pos[1];
@@ -237,6 +249,11 @@ void fillTriangleBarycentric(DisplayX11& display, modelling::Triangle& t) {
     }
 }
 
+/*
+ * Triangle rasterization using the scan line algorithm.
+ * For this the vertices are sorted by their y-coordinate and then the triangle is rendered in two parts. From the top
+ * to the middle part, and then from the middle to the bottom.
+ */
 void fillTriangleScanLine(DisplayX11& display, modelling::Triangle& t) {
     math::vec3 c;
     math::vec3 v0 = t.pos[0];
