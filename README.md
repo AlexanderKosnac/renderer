@@ -40,3 +40,10 @@ This means only comments (`#`), vertices (`v`), and faces (`f`) are properly pro
 See the files included in this repository as examples.
 There is no support for textures.
 Texture coordinates and faces referencing them are not properly read, **do not** include them!
+
+
+## Linting
+
+There are two linters implemented: `clang-tidy`, `cpp-linter`. The results of
+both can be viewed in the Action tab of the GitHub repository. Both produce
+annotations and/or artifacts.
