@@ -5,3 +5,7 @@ runUnitTests
 
 # IDE
 .vscode/
+
+# Linter results
+clang-tidy-report.txt
+compile_commands.json
