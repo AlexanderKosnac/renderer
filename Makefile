@@ -1,5 +1,5 @@
 CXX = g++
-CFLAGS += -g -O3 -DLINUX -Wall -Wextra
+CFLAGS += -std=c++17 -g -O3 -DLINUX -Wall -Wextra
 
 EXEC = renderer
 SRCS = $(shell find ./src -name "*.cpp")
