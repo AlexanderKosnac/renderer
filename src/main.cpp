@@ -1,4 +1,5 @@
 #include <X11/Xlib.h>
+#include <X11/Xutil.h>
 
 #include <iostream>
 #include <chrono>
@@ -15,6 +16,7 @@
 #include "rasterizer/rasterizer.h"
 #include "display/x11display.h"
 #include "display/callbacktypes.h"
+#include "display/framebuffer.h"
 
 int main(int argc, char* argv[]) {
     modelling::Camera cam(60.0f, 4.0/3.0, 0.1f, 1000.0f, math::vec3(0.0f, 0.0f, 0.0f), math::vec3(0.0f, 1.0f, 0.0f), math::vec3(0.0f, 0.0f, 1.0f));
@@ -149,14 +151,23 @@ int main(int argc, char* argv[]) {
     #pragma GCC diagnostic pop
 
     DisplayX11 display(960, 720);
+
+    auto onWindowResize = [&camera, &display](XEvent& event) mutable {
+        int w = event.xconfigure.width;
+        int h = event.xconfigure.height;
+        display.setDimensions(w, h);
+    };
+
     display.addListener(EXPOSE, onExpose);
     display.addListener(KEY_PRESS, onKeyPress);
     display.addListener(KEY_RELEASE, onKeyRelease);
     display.addListener(BUTTON_PRESS, onButtonPress);
     display.addListener(BUTTON_RELEASE, onButtonRelease);
     display.addListener(MOUSE_MOTION, onMouseMotion);
+    display.addListener(WINDOW_RESIZE, onWindowResize);
 
-    Rasterizer renderer(display, scene);
+    Framebuffer framebuffer(96, 72);
+    Rasterizer renderer(framebuffer, scene);
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
@@ -164,8 +175,8 @@ int main(int argc, char* argv[]) {
 
     bool running = true;
     while (running) {
-        display.clear();
-        display.clearZBuffer();
+        framebuffer.clear();
+        framebuffer.clearZ();
 
         camera.updateViewTransformation();
         renderer.updateProjectionMatrix();
@@ -173,9 +184,13 @@ int main(int argc, char* argv[]) {
         renderer.render();
 
         end = std::chrono::steady_clock::now();
+
         ms = std::chrono::duration_cast<std::chrono::milliseconds> (end - begin).count();
         display.setWindowTitle(fmt::format("Renderer [Tick in {} ms, approx. {:.2f} fps]", ms, 1000.0f/((ms == 0) ? 1 : ms)));
-        display.update();
+
+        display.pollEvents();
+        display.present(framebuffer);
+
         begin = std::chrono::steady_clock::now();
     }
 }

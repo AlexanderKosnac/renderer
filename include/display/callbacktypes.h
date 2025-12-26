@@ -8,6 +8,7 @@ enum CallbackType {
     BUTTON_PRESS,
     BUTTON_RELEASE,
     MOUSE_MOTION,
+    WINDOW_RESIZE,
 };
 
 #endif

@@ -1,14 +1,17 @@
 #include <X11/Xlib.h>
+#include <X11/Xutil.h>
 
 #include <iostream>
 #include <map>
 #include <list>
 #include <cstdlib>
 #include <cfloat>
+#include <cstring>
 
 #include "math.h"
 #include "display/x11display.h"
 #include "display/callbacktypes.h"
+#include "display/framebuffer.h"
 
 std::map<int, CallbackType> eventMapping = {
     {Expose, EXPOSE},
@@ -17,13 +20,12 @@ std::map<int, CallbackType> eventMapping = {
     {ButtonPress, BUTTON_PRESS},
     {ButtonRelease, BUTTON_RELEASE},
     {MotionNotify, MOUSE_MOTION},
+    {ConfigureNotify, WINDOW_RESIZE},
 };
 
 DisplayX11::DisplayX11(int pWidth, int pHeight) {
     width = pWidth;
     height = pHeight;
-    image = new unsigned char[width*height*4];
-    zbuffer = new float[width*height];
 
     display = XOpenDisplay(nullptr);
     if (display == nullptr) {
@@ -34,7 +36,7 @@ DisplayX11::DisplayX11(int pWidth, int pHeight) {
     screen = DefaultScreen(display);
     window = XCreateSimpleWindow(display, RootWindow(display, screen), 0, 0, width, height, 1, WhitePixel(display, screen), BlackPixel(display, screen));
 
-    XSelectInput(display, window, KeyPressMask | KeyReleaseMask | PointerMotionMask | ButtonPressMask | ButtonReleaseMask | ExposureMask);
+    XSelectInput(display, window, KeyPressMask | KeyReleaseMask | PointerMotionMask | ButtonPressMask | ButtonReleaseMask | ExposureMask | StructureNotifyMask);
     XMapWindow(display, window);
 }
 
@@ -46,12 +48,17 @@ void DisplayX11::addListener(CallbackType type, std::function<void(XEvent&)> cal
     listeners[type].push_back(callbackFn);
 }
 
-float DisplayX11::getWidth() {
+int DisplayX11::getWidth() {
     return width;
 }
 
-float DisplayX11::getHeight() {
+int DisplayX11::getHeight() {
     return height;
+}
+
+void DisplayX11::setDimensions(int w, int h) {
+    width = w;
+    height = h;
 }
 
 void DisplayX11::setWindowTitle(const std::string& s) {
@@ -60,47 +67,66 @@ void DisplayX11::setWindowTitle(const std::string& s) {
 
 void DisplayX11::handleEvent(XEvent& event) {
     CallbackType cbt = eventMapping[event.type];
-    if (!cbt) return;
+    if (!cbt)
+        return;
 
     for (const auto& callback : listeners[cbt]) {
         callback(event);
     }
 }
 
-void DisplayX11::update() {
+void DisplayX11::pollEvents() {
+    while (XPending(display)) {
+        XEvent event;
+        XNextEvent(display, &event);
+        handleEvent(event);
+    }
+}
+
+void DisplayX11::present(const Framebuffer& fb) {
+    const int winW = width;
+    const int winH = height;
+
+    if (winW <= 0 || winH <= 0)
+        return;
+
+    if ((int)windowBuffer.size() != winW * winH * 4) {
+        windowBuffer.resize(winW * winH * 4);
+    }
+
+    // Nearest-neighbor scaling
+    const float sx = static_cast<float>(fb.width)  / winW;
+    const float sy = static_cast<float>(fb.height) / winH;
+
+    for (int y = 0; y < winH; ++y) {
+        int srcY = static_cast<int>(y * sy);
+        if (srcY >= fb.height) srcY = fb.height - 1;
+
+        for (int x = 0; x < winW; ++x) {
+            int srcX = static_cast<int>(x * sx);
+            if (srcX >= fb.width) srcX = fb.width - 1;
+
+            const int dstI = (y * winW + x) * 4;
+            const int srcI = (srcY * fb.width + srcX) * 4;
+
+            windowBuffer[dstI + 0] = fb.color[srcI + 0];
+            windowBuffer[dstI + 1] = fb.color[srcI + 1];
+            windowBuffer[dstI + 2] = fb.color[srcI + 2];
+            windowBuffer[dstI + 3] = 255;
+        }
+    }
+
     const int depth = 24;
     const int pad = 32;
 
-    XImage* ximg = XCreateImage(display, DefaultVisual(display, screen), depth, ZPixmap, 0, reinterpret_cast<char*>(image), width, height, pad, 0);
-    XPutImage(display, window, DefaultGC(display, screen), ximg, 0, 0, 0, 0, width, height);
+    XImage* img = XCreateImage(display, DefaultVisual(display, screen), depth, ZPixmap, 0, reinterpret_cast<char*>(windowBuffer.data()), winW, winH, pad, 0);
+    XPutImage(display, window, DefaultGC(display, screen), img, 0, 0, 0, 0, winW, winH);
 
-    XEvent event;
-    XNextEvent(display, &event);
-    handleEvent(event);
+    img->data = nullptr;
+    XDestroyImage(img);
 }
 
-void DisplayX11::setPixel(int x, int y, float z, const math::vec3& color) {
-    if (x < 0 || y < 0 || x >= width || y >= height) return;
-    int i = y * width + x;
-    if (z > zbuffer[i]) return; // Smaller z means closer to the camera.
-    zbuffer[i] = z;
-    int ii = i * 4;
-    image[ii+0] = color.z;
-    image[ii+1] = color.y;
-    image[ii+2] = color.x;
-    image[ii+3] = 255;
-}
-
-void DisplayX11::clear() {
-    const int m = width*height*4;
-    for (int i=0; i<m; ++i) {
-        image[i] = 0;
-    }
-}
-
-void DisplayX11::clearZBuffer() {
-    const int m = width*height;
-    for (int i=0; i<m; ++i) {
-        zbuffer[i] = 1.0f;
-    }
+void DisplayX11::resizeWindow(int w, int h) {
+    XResizeWindow(display, window, w, h);
+    XFlush(display);
 }

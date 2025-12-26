@@ -9,6 +9,7 @@
 #include <X11/Xlib.h>
 
 #include "display/callbacktypes.h"
+#include "display/framebuffer.h"
 
 class DisplayX11 {
 private:
@@ -18,8 +19,8 @@ private:
 
     int width;
     int height;
-    unsigned char* image;
-    float* zbuffer;
+
+    std::vector<unsigned char> windowBuffer;
 
     std::map<CallbackType, std::vector<std::function<void(XEvent&)>>> listeners;
 
@@ -30,16 +31,18 @@ public:
 
     void addListener(CallbackType type, std::function<void(XEvent&)> callbackFn);
 
-    float getWidth();
-    float getHeight();
+    int getWidth();
+    int getHeight();
+
+    void setDimensions(int width, int height);
 
     void setWindowTitle(const std::string& s);
 
     void handleEvent(XEvent &event);
-    void update();
-    void setPixel(int x, int y, float z, const math::vec3& color);
-    void clear();
-    void clearZBuffer();
+
+    void present(const Framebuffer& fb);
+    void pollEvents();
+    void resizeWindow(int w, int h);
 };
 
 #endif

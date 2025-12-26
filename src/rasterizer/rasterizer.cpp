@@ -5,19 +5,20 @@
 
 #include "math.h"
 #include "display/x11display.h"
+#include "display/framebuffer.h"
 #include "modelling/camera.h"
 #include "modelling/scene.h"
 #include "modelling/transformations.h"
 
-Rasterizer::Rasterizer(DisplayX11& pDisplay, Scene& pScene) : display(pDisplay), scene(pScene) {
+Rasterizer::Rasterizer(Framebuffer& fb, Scene& scene) : framebuffer(fb), scene(scene) {
     updateProjectionMatrix();
 }
 
 void Rasterizer::render() {
     math::vec3& pos = scene.getCamera().pos;
 
-    float width2 = 0.5f * display.getWidth();
-    float height2 = 0.5f * display.getHeight();
+    float width2 = 0.5f * framebuffer.width;
+    float height2 = 0.5f * framebuffer.height;
 
     std::vector<modelling::Triangle> depthClippedTriangles;
 
@@ -98,10 +99,10 @@ void Rasterizer::render() {
                 nNewTriangles--;
 
                 switch (p) {
-                    case 0: nTrisToAdd = modelling::clipTriangleByPlane(candidate, math::vec3(0.0f, 0.0f, 0.0f),                  math::vec3( 0.0f,  1.0f, 0.0f), t[0], t[1]); break; // Right
-                    case 1: nTrisToAdd = modelling::clipTriangleByPlane(candidate, math::vec3(0.0f, display.getHeight()-1, 0.0f), math::vec3( 0.0f, -1.0f, 0.0f), t[0], t[1]); break; // Top
-                    case 2: nTrisToAdd = modelling::clipTriangleByPlane(candidate, math::vec3(0.0f, 0.0f, 0.0f),                  math::vec3( 1.0f,  0.0f, 0.0f), t[0], t[1]); break; // Left
-                    case 3: nTrisToAdd = modelling::clipTriangleByPlane(candidate, math::vec3(display.getWidth()-1, 0.0f, 0.0f),  math::vec3(-1.0f,  0.0f, 0.0f), t[0], t[1]); break; // Bottom
+                    case 0: nTrisToAdd = modelling::clipTriangleByPlane(candidate, math::vec3(0.0f, 0.0f, 0.0f),                 math::vec3( 0.0f,  1.0f, 0.0f), t[0], t[1]); break; // Right
+                    case 1: nTrisToAdd = modelling::clipTriangleByPlane(candidate, math::vec3(0.0f, framebuffer.height-1, 0.0f), math::vec3( 0.0f, -1.0f, 0.0f), t[0], t[1]); break; // Top
+                    case 2: nTrisToAdd = modelling::clipTriangleByPlane(candidate, math::vec3(0.0f, 0.0f, 0.0f),                 math::vec3( 1.0f,  0.0f, 0.0f), t[0], t[1]); break; // Left
+                    case 3: nTrisToAdd = modelling::clipTriangleByPlane(candidate, math::vec3(framebuffer.width-1, 0.0f, 0.0f),  math::vec3(-1.0f,  0.0f, 0.0f), t[0], t[1]); break; // Bottom
                 }
 
                 // Store sub triangles created by clipping process.
@@ -155,7 +156,7 @@ void Rasterizer::drawLine(float x1, float y1, math::vec3& color1, float x2, floa
             colorB = color1;
         }
 
-        display.setPixel(x, y, LINE_Z, colorB);
+        framebuffer.setPixel(x, y, LINE_Z, colorB);
 
         for (int i=0; x<xe; i++) {
             x += 1;
@@ -166,7 +167,7 @@ void Rasterizer::drawLine(float x1, float y1, math::vec3& color1, float x2, floa
                 px = px + 2 * (dy1 - dx1);
             }
             math::vec3 color = math::linInterpolVec3((float)i/(float)dx1, colorA, colorB);
-            display.setPixel(x, y, LINE_Z, color);
+            framebuffer.setPixel(x, y, LINE_Z, color);
         }
     } else {
         if (dy < 0) {
@@ -183,7 +184,7 @@ void Rasterizer::drawLine(float x1, float y1, math::vec3& color1, float x2, floa
             colorB = color1;
         }
 
-        display.setPixel(x, y, LINE_Z, colorB);
+        framebuffer.setPixel(x, y, LINE_Z, colorB);
 
         for (int i=0; y<ye; i++) {
             y += 1;
@@ -194,7 +195,7 @@ void Rasterizer::drawLine(float x1, float y1, math::vec3& color1, float x2, floa
                 py = py + 2 * dx1;
             }
             math::vec3 color = math::linInterpolVec3((float)i/(float)dy1, colorA, colorB);
-            display.setPixel(x, y, LINE_Z, color);
+            framebuffer.setPixel(x, y, LINE_Z, color);
         }
     }
 }
@@ -218,7 +219,7 @@ void Rasterizer::drawTriangle(modelling::Triangle& t) {
  * determine whether or not the pixel is located within the triangle.
  * Relyable but expensive implementation.
  */
-void fillTriangleBarycentric(DisplayX11& display, modelling::Triangle& t) {
+void fillTriangleBarycentric(Framebuffer& framebuffer, modelling::Triangle& t) {
     const math::vec3 v0 = t.pos[0];
     const math::vec3 v1 = t.pos[1];
     const math::vec3 v2 = t.pos[2];
@@ -243,7 +244,7 @@ void fillTriangleBarycentric(DisplayX11& display, modelling::Triangle& t) {
                     c0.z * l0 + c1.z * l1 + c2.z * l2
                 );
                 float z = v0.z*l0 + v1.z*l1 + v2.z*l2;
-                display.setPixel(x, y, z, color);
+                framebuffer.setPixel(x, y, z, color);
             }
         }
     }
@@ -254,7 +255,7 @@ void fillTriangleBarycentric(DisplayX11& display, modelling::Triangle& t) {
  * For this the vertices are sorted by their y-coordinate and then the triangle is rendered in two parts. From the top
  * to the middle part, and then from the middle to the bottom.
  */
-void fillTriangleScanLine(DisplayX11& display, modelling::Triangle& t) {
+void fillTriangleScanLine(Framebuffer& framebuffer, modelling::Triangle& t) {
     math::vec3 c;
     math::vec3 v0 = t.pos[0];
     math::vec3 v1 = t.pos[1];
@@ -291,7 +292,7 @@ void fillTriangleScanLine(DisplayX11& display, modelling::Triangle& t) {
             float t = (xStart == xEnd) ? 1.0f : static_cast<float>(x-xStart)/(xEnd-xStart);
             float z = math::linInterpolFloat(t, zStart, zEnd);
             c = math::linInterpolVec3(t, colorStart, colorEnd);
-            display.setPixel(x, static_cast<int>(y), z, c);
+            framebuffer.setPixel(x, static_cast<int>(y), z, c);
         }
     }
 
@@ -316,12 +317,12 @@ void fillTriangleScanLine(DisplayX11& display, modelling::Triangle& t) {
             float t = (xStart == xEnd) ? 1.0f : static_cast<float>(x-xStart)/(xEnd-xStart);
             float z = math::linInterpolFloat(t, zStart, zEnd);
             c = math::linInterpolVec3(t, colorStart, colorEnd);
-            display.setPixel(x, static_cast<int>(y), z, c);
+            framebuffer.setPixel(x, static_cast<int>(y), z, c);
         }
     }
 }
 
 void Rasterizer::fillTriangle(modelling::Triangle& t) {
-    //fillTriangleBarycentric(display, t);
-    fillTriangleScanLine(display, t);
+    //fillTriangleBarycentric(framebuffer, t);
+    fillTriangleScanLine(framebuffer, t);
 }

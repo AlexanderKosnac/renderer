@@ -48,9 +48,9 @@ namespace transformation {
         float cy = cos(radY), sy = sin(radY);
         float cr = cos(radZ), sr = sin(radZ);
         return math::mat3x3(
-            math::vec3(cr*cy, sr*cy, -sy),
-            math::vec3(sp*cr*sy-cp*sr, sp*sr*sy+cp*cr, sp*cy),
-            math::vec3(cp*cr*cy+sp*sr, cp*sr*sy-sp*cr, cp*cy)
+            math::vec3(cr * cy, sr * cy, -sy),
+            math::vec3(sp * cr * sy - cp * sr, sp * sr * sy + cp * cr, sp * cy),
+            math::vec3(cp * cr * cy + sp * sr, cp * sr * sy - sp * cr, cp * cy)
         );
 
     }

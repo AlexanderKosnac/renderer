@@ -2,18 +2,18 @@
 #define RASTERIZER
 
 #include "math.h"
-#include "display/x11display.h"
+#include "display/framebuffer.h"
 #include "modelling/scene.h"
 
 class Rasterizer {
 private:
-    DisplayX11& display;
+    Framebuffer& framebuffer;
     Scene& scene;
 
     math::mat4x4 projectionMatrix;
 
 public:
-    Rasterizer(DisplayX11& pDisplay, Scene& pScene);
+    Rasterizer(Framebuffer& fb, Scene& scene);
 
     void render();
 
