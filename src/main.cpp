@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <chrono>
+#include <thread>
 #include <cmath>
 #include <vector>
 #include <fmt/core.h>
@@ -72,6 +73,9 @@ int main(int argc, char* argv[]) {
     }
 
     modelling::Camera& camera = scene.getCamera();
+    DisplayX11 display(640, 480);
+    Framebuffer framebuffer(64*4, 48*4);
+    Rasterizer renderer(framebuffer, scene);
 
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -150,8 +154,6 @@ int main(int argc, char* argv[]) {
     auto onMouseMotion = [&camera](XEvent& event) mutable {};
     #pragma GCC diagnostic pop
 
-    DisplayX11 display(960, 720);
-
     auto onWindowResize = [&camera, &display](XEvent& event) mutable {
         int w = event.xconfigure.width;
         int h = event.xconfigure.height;
@@ -166,31 +168,39 @@ int main(int argc, char* argv[]) {
     display.addListener(MOUSE_MOTION, onMouseMotion);
     display.addListener(WINDOW_RESIZE, onWindowResize);
 
-    Framebuffer framebuffer(96, 72);
-    Rasterizer renderer(framebuffer, scene);
+    using clock = std::chrono::steady_clock;
 
-    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-    int ms;
+    constexpr double TARGET_FPS = 30.0;
+    constexpr auto FRAME_TIME = std::chrono::duration<double, std::milli>(1000.0 / TARGET_FPS);
 
     bool running = true;
+
     while (running) {
+        auto frameStart = clock::now();
+
         framebuffer.clear();
         framebuffer.clearZ();
 
         camera.updateViewTransformation();
         renderer.updateProjectionMatrix();
-
         renderer.render();
-
-        end = std::chrono::steady_clock::now();
-
-        ms = std::chrono::duration_cast<std::chrono::milliseconds> (end - begin).count();
-        display.setWindowTitle(fmt::format("Renderer [Tick in {} ms, approx. {:.2f} fps]", ms, 1000.0f/((ms == 0) ? 1 : ms)));
 
         display.pollEvents();
         display.present(framebuffer);
 
-        begin = std::chrono::steady_clock::now();
+        auto frameEnd = clock::now();
+        auto frameDuration = frameEnd - frameStart;
+
+        double ms = std::chrono::duration<double, std::milli>(frameDuration).count();
+        display.setWindowTitle(fmt::format(
+            "Renderer [{:.2f} ms per frame | {:.1f} fps (capped to {:.1f})]",
+            ms,
+            1000.0 / std::max(ms, 0.001),
+            TARGET_FPS
+        ));
+
+        if (frameDuration < FRAME_TIME) {
+            std::this_thread::sleep_for(FRAME_TIME - frameDuration);
+        }
     }
 }
