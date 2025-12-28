@@ -4,7 +4,9 @@ runUnitTests
 *.o
 
 # IDE
-.vscode/
+.vscode/*
+!.vscode/
+!.vscode/settings.json
 
 # Linter results
 clang-tidy-report.txt

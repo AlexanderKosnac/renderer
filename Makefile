@@ -30,3 +30,6 @@ clean:
 
 test: $(TEST_EXEC)
 	./$(TEST_EXEC)
+
+format:
+	clang-format -i $(shell find . -name "*.cpp" -o -name "*.h")
