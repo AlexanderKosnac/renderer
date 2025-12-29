@@ -1,27 +1,27 @@
 #ifndef RASTERIZER
 #define RASTERIZER
 
-#include "math.h"
 #include "display/framebuffer.h"
+#include "math.h"
 #include "modelling/scene.h"
 
 class Rasterizer {
-private:
-    Framebuffer& framebuffer;
-    Scene& scene;
+  private:
+    Framebuffer &framebuffer;
+    Scene &scene;
 
     math::mat4x4 projectionMatrix;
 
-public:
-    Rasterizer(Framebuffer& fb, Scene& scene);
+  public:
+    Rasterizer(Framebuffer &fb, Scene &scene);
 
     void render();
 
     void updateProjectionMatrix();
 
-    void drawLine(float x1, float y1, math::vec3& color1, float x2, float y2, math::vec3& color2);
-    void drawTriangle(modelling::Triangle& t);
-    void fillTriangle(modelling::Triangle& t);
+    void drawLine(float x1, float y1, math::vec3 &color1, float x2, float y2, math::vec3 &color2);
+    void drawTriangle(modelling::Triangle &t);
+    void fillTriangle(modelling::Triangle &t);
 };
 
 #endif

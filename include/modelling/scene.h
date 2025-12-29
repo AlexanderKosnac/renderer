@@ -4,26 +4,26 @@
 #include <vector>
 
 #include "math.h"
-#include "modelling/triangle.h"
-#include "modelling/mesh.h"
 #include "modelling/camera.h"
+#include "modelling/mesh.h"
 #include "modelling/sceneobject.h"
+#include "modelling/triangle.h"
 
 class Scene {
-private:
+  private:
     std::vector<modelling::SceneObject> objects;
     modelling::Camera camera;
     math::vec3 ambientLight;
 
-public:
-    Scene(modelling::Camera& c, math::vec3& ambientLight);
+  public:
+    Scene(modelling::Camera &c, math::vec3 &ambientLight);
 
-    void addObject(const modelling::Mesh& mesh);
-    void addObject(const modelling::Mesh& mesh, const std::vector<math::mat4x4>& modelTransformation);
+    void addObject(const modelling::Mesh &mesh);
+    void addObject(const modelling::Mesh &mesh, const std::vector<math::mat4x4> &modelTransformation);
 
-    const std::vector<modelling::SceneObject>& getObjects();
-    modelling::Camera& getCamera();
-    math::vec3& getAmbientLight();
+    const std::vector<modelling::SceneObject> &getObjects();
+    modelling::Camera &getCamera();
+    math::vec3 &getAmbientLight();
 };
 
 #endif

@@ -8,11 +8,11 @@
 
 namespace modelling {
 
-    struct SceneObject {
-        modelling::Mesh mesh;
-        std::vector<math::mat4x4> modelTransformations;
-    };
+struct SceneObject {
+    modelling::Mesh mesh;
+    std::vector<math::mat4x4> modelTransformations;
+};
 
-}
+} // namespace modelling
 
 #endif

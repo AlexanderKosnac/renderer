@@ -1,29 +1,29 @@
 #ifndef MESH
 #define MESH
 
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "math.h"
 #include "modelling/triangle.h"
 
 namespace modelling {
 
-    class Mesh {
-    private:
-        std::vector<Triangle> triangles;
+class Mesh {
+  private:
+    std::vector<Triangle> triangles;
 
-    public:
-        Mesh();
-        Mesh(const std::string& filepath);
+  public:
+    Mesh();
+    Mesh(const std::string &filepath);
 
-        void addTriangle(Triangle& t);
+    void addTriangle(Triangle &t);
 
-        const std::vector<Triangle>& getTriangles();
+    const std::vector<Triangle> &getTriangles();
 
-        bool fromObjFile(const std::string& filepath);
-    };
+    bool fromObjFile(const std::string &filepath);
+};
 
-}
+} // namespace modelling
 
 #endif

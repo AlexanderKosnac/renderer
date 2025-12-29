@@ -1,8 +1,8 @@
 #ifndef FRAMEBUFFER
 #define FRAMEBUFFER
 
-#include <vector>
 #include <algorithm>
+#include <vector>
 
 #include "math.h"
 
@@ -11,19 +11,15 @@ struct Framebuffer {
     int height;
 
     std::vector<unsigned char> color; // RGBA, 8 bits per channel
-    std::vector<float> zbuffer; // Depth buffer, 0 = near, 1 = far
+    std::vector<float> zbuffer;       // Depth buffer, 0 = near, 1 = far
 
     Framebuffer(int w, int h) : width(w), height(h), color(w * h * 4), zbuffer(w * h, 1.0f) {}
 
-    void clear() {
-        std::fill(color.begin(), color.end(), 0);
-    }
+    void clear() { std::fill(color.begin(), color.end(), 0); }
 
-    void clearZ() {
-        std::fill(zbuffer.begin(), zbuffer.end(), 1.0f);
-    }
+    void clearZ() { std::fill(zbuffer.begin(), zbuffer.end(), 1.0f); }
 
-    void setPixel(int x, int y, float z, const math::vec3& c) {
+    void setPixel(int x, int y, float z, const math::vec3 &c) {
         if (x < 0 || y < 0 || x >= width || y >= height)
             return;
 

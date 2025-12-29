@@ -1,26 +1,21 @@
+#include "display/x11display.h"
+
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
-#include <iostream>
-#include <map>
-#include <list>
-#include <cstdlib>
 #include <cfloat>
+#include <cstdlib>
 #include <cstring>
+#include <iostream>
+#include <list>
+#include <map>
 
-#include "math.h"
-#include "display/x11display.h"
 #include "display/callbacktypes.h"
 #include "display/framebuffer.h"
+#include "math.h"
 
 std::map<int, CallbackType> eventMapping = {
-    {Expose, EXPOSE},
-    {KeyPress, KEY_PRESS},
-    {KeyRelease, KEY_RELEASE},
-    {ButtonPress, BUTTON_PRESS},
-    {ButtonRelease, BUTTON_RELEASE},
-    {MotionNotify, MOUSE_MOTION},
-    {ConfigureNotify, WINDOW_RESIZE},
+    {Expose, EXPOSE}, {KeyPress, KEY_PRESS}, {KeyRelease, KEY_RELEASE}, {ButtonPress, BUTTON_PRESS}, {ButtonRelease, BUTTON_RELEASE}, {MotionNotify, MOUSE_MOTION}, {ConfigureNotify, WINDOW_RESIZE},
 };
 
 DisplayX11::DisplayX11(int pWidth, int pHeight) {
@@ -40,37 +35,27 @@ DisplayX11::DisplayX11(int pWidth, int pHeight) {
     XMapWindow(display, window);
 }
 
-DisplayX11::~DisplayX11() {
-    XCloseDisplay(display);
-}
+DisplayX11::~DisplayX11() { XCloseDisplay(display); }
 
-void DisplayX11::addListener(CallbackType type, std::function<void(XEvent&)> callbackFn) {
-    listeners[type].push_back(callbackFn);
-}
+void DisplayX11::addListener(CallbackType type, std::function<void(XEvent &)> callbackFn) { listeners[type].push_back(callbackFn); }
 
-int DisplayX11::getWidth() {
-    return width;
-}
+int DisplayX11::getWidth() { return width; }
 
-int DisplayX11::getHeight() {
-    return height;
-}
+int DisplayX11::getHeight() { return height; }
 
 void DisplayX11::setDimensions(int w, int h) {
     width = w;
     height = h;
 }
 
-void DisplayX11::setWindowTitle(const std::string& s) {
-    XStoreName(display, window, s.c_str());
-}
+void DisplayX11::setWindowTitle(const std::string &s) { XStoreName(display, window, s.c_str()); }
 
-void DisplayX11::handleEvent(XEvent& event) {
+void DisplayX11::handleEvent(XEvent &event) {
     CallbackType cbt = eventMapping[event.type];
     if (!cbt)
         return;
 
-    for (const auto& callback : listeners[cbt]) {
+    for (const auto &callback : listeners[cbt]) {
         callback(event);
     }
 }
@@ -83,7 +68,7 @@ void DisplayX11::pollEvents() {
     }
 }
 
-void DisplayX11::present(const Framebuffer& fb) {
+void DisplayX11::present(const Framebuffer &fb) {
     const int winW = width;
     const int winH = height;
 
@@ -95,16 +80,18 @@ void DisplayX11::present(const Framebuffer& fb) {
     }
 
     // Nearest-neighbor scaling
-    const float sx = static_cast<float>(fb.width)  / winW;
+    const float sx = static_cast<float>(fb.width) / winW;
     const float sy = static_cast<float>(fb.height) / winH;
 
     for (int y = 0; y < winH; ++y) {
         int srcY = static_cast<int>(y * sy);
-        if (srcY >= fb.height) srcY = fb.height - 1;
+        if (srcY >= fb.height)
+            srcY = fb.height - 1;
 
         for (int x = 0; x < winW; ++x) {
             int srcX = static_cast<int>(x * sx);
-            if (srcX >= fb.width) srcX = fb.width - 1;
+            if (srcX >= fb.width)
+                srcX = fb.width - 1;
 
             const int dstI = (y * winW + x) * 4;
             const int srcI = (srcY * fb.width + srcX) * 4;
@@ -119,7 +106,7 @@ void DisplayX11::present(const Framebuffer& fb) {
     const int depth = 24;
     const int pad = 32;
 
-    XImage* img = XCreateImage(display, DefaultVisual(display, screen), depth, ZPixmap, 0, reinterpret_cast<char*>(windowBuffer.data()), winW, winH, pad, 0);
+    XImage *img = XCreateImage(display, DefaultVisual(display, screen), depth, ZPixmap, 0, reinterpret_cast<char *>(windowBuffer.data()), winW, winH, pad, 0);
     XPutImage(display, window, DefaultGC(display, screen), img, 0, 0, 0, 0, winW, winH);
 
     img->data = nullptr;
