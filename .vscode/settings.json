@@ -4,10 +4,17 @@
     "editor.defaultFormatter": "ms-vscode.cpptools",
     "editor.formatOnSave": true
   },
+  "[yaml]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "prettier.tabWidth": 2,
   "files.associations": {
     "*.h": "cpp",
     "*.hpp": "cpp",
-    "*.tcc": "cpp"
+    "*.tcc": "cpp",
+    "*.yml": "yaml"
   },
   "editor.detectIndentation": false,
   "editor.tabSize": 4,

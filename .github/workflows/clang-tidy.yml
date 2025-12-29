@@ -11,24 +11,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt install -y libx11-dev
-        sudo apt install libfmt-dev
-        sudo apt-get install -y clang-tidy
-        sudo apt-get install -y bear
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt install -y libx11-dev
+          sudo apt install libfmt-dev
+          sudo apt-get install -y clang-tidy
+          sudo apt-get install -y bear
 
-    - name: Run clang-tidy
-      run: |
-        bear -- make
-        clang-tidy --quiet -p . $(find . -name "*.cpp") > clang-tidy-report.txt || true
+      - name: Run clang-tidy
+        run: |
+          bear -- make
+          clang-tidy --quiet -p . $(find . -name "*.cpp" -o -name "*.h") > clang-tidy-report.txt || true
 
-    - name: Upload report as artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: clang-tidy-report
-        path: clang-tidy-report.txt
+      - name: Upload report as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: clang-tidy-report
+          path: clang-tidy-report.txt
