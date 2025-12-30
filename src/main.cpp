@@ -5,7 +5,10 @@
 #include <chrono>
 #include <cmath>
 #include <iostream>
+#include <stdexcept>
+#include <string>
 #include <thread>
+#include <unordered_map>
 #include <vector>
 
 #include "display/callbacktypes.h"
@@ -19,63 +22,102 @@
 #include "modelling/triangle.h"
 #include "rasterizer/rasterizer.h"
 
-int main(int argc, char *argv[]) {
-    modelling::Camera cam(60.0f, 4.0 / 3.0, 0.1f, 1000.0f, math::vec3(0.0f, 0.0f, 0.0f), math::vec3(0.0f, 1.0f, 0.0f), math::vec3(0.0f, 0.0f, 1.0f));
+struct AppConfig {
+    int displayWidth = 640;
+    int displayHeight = 480;
 
+    int fbWidth = 64 * 4;
+    int fbHeight = 48 * 4;
+
+    std::string scene = "teapot";
+};
+
+static void parseDimension(const std::string &s, int &w, int &h) {
+    auto pos = s.find('x');
+    if (pos == std::string::npos) {
+        throw std::runtime_error("Invalid dimension format (expected WxH)");
+    }
+
+    w = std::stoi(s.substr(0, pos));
+    h = std::stoi(s.substr(pos + 1));
+
+    if (w <= 0 || h <= 0) {
+        throw std::runtime_error("Dimensions must be positive");
+    }
+}
+
+AppConfig parseArgs(int argc, char *argv[]) {
+    AppConfig cfg;
+
+    for (int i = 1; i < argc; ++i) {
+        std::string arg = argv[i];
+
+        if (arg == "--scene" && i + 1 < argc) {
+            cfg.scene = argv[++i];
+        } else if (arg == "--display" && i + 1 < argc) {
+            parseDimension(argv[++i], cfg.displayWidth, cfg.displayHeight);
+        } else if (arg == "--framebuffer" && i + 1 < argc) {
+            parseDimension(argv[++i], cfg.fbWidth, cfg.fbHeight);
+        } else {
+            throw std::runtime_error("Unknown or incomplete argument: " + arg);
+        }
+    }
+
+    return cfg;
+}
+
+int main(int argc, char *argv[]) {
+    AppConfig cfg = parseArgs(argc, argv);
+
+    DisplayX11 display(cfg.displayWidth, cfg.displayHeight);
+    Framebuffer framebuffer(cfg.fbWidth, cfg.fbHeight);
+
+    modelling::Camera cam(60.0f, 4.0 / 3.0, 0.1f, 1000.0f, math::vec3(0.0f, 0.0f, 0.0f), math::vec3(0.0f, 1.0f, 0.0f), math::vec3(0.0f, 0.0f, 1.0f));
     math::vec3 light(0.0f, -1.0f, 0.0f);
 
     Scene scene(cam, light);
 
-    if (argc > 1) {
-        std::string select = argv[1];
-        if (select == "triangle") {
-            scene.addObject(modelling::Mesh("objs/triangle.obj"), {
-                                                                      transformation::translate(0.0f, 0.0f, -3.0f),
-                                                                  });
-        } else if (select == "axis") {
-            scene.addObject(modelling::Mesh("objs/axis.obj"), {});
-        } else if (select == "cube") {
-            scene.addObject(modelling::Mesh("objs/cube.obj"), {
-                                                                  transformation::rotationY(30.0f).toMat4x4(),
-                                                                  transformation::rotationX(30.0f).toMat4x4(),
+    modelling::Camera &camera = scene.getCamera();
+    Rasterizer renderer(framebuffer, scene);
+
+    const std::string &select = cfg.scene;
+    if (select == "triangle") {
+        scene.addObject(modelling::Mesh("objs/triangle.obj"), {
                                                                   transformation::translate(0.0f, 0.0f, -3.0f),
                                                               });
-        } else if (select == "d20") {
-            scene.addObject(modelling::Mesh("objs/d20.obj"), {
-                                                                 transformation::scale(2.0f).toMat4x4(),
-                                                                 transformation::rotationX(10.0f).toMat4x4(),
-                                                                 transformation::translate(0.0f, 0.0f, -20.0f),
+    } else if (select == "axis") {
+        scene.addObject(modelling::Mesh("objs/axis.obj"), {});
+    } else if (select == "cube") {
+        scene.addObject(modelling::Mesh("objs/cube.obj"), {
+                                                              transformation::rotationY(30.0f).toMat4x4(),
+                                                              transformation::rotationX(30.0f).toMat4x4(),
+                                                              transformation::translate(0.0f, 0.0f, -3.0f),
+                                                          });
+    } else if (select == "d20") {
+        scene.addObject(modelling::Mesh("objs/d20.obj"), {
+                                                             transformation::scale(2.0f).toMat4x4(),
+                                                             transformation::rotationX(10.0f).toMat4x4(),
+                                                             transformation::translate(0.0f, 0.0f, -20.0f),
+                                                         });
+    } else if (select == "kokiri") {
+        scene.addObject(modelling::Mesh("objs/kokiri.obj"), {
+                                                                transformation::scale(0.1f).toMat4x4(),
+                                                                transformation::rotationY(165.0f).toMat4x4(),
+                                                                transformation::translate(0.0f, -50.0f, -20.0f),
+                                                            });
+    } else if (select == "psyduck") {
+        scene.addObject(modelling::Mesh("objs/psyduck.obj"), {
+                                                                 transformation::scale(0.01f).toMat4x4(),
+                                                                 transformation::translate(0.0f, -2.0f, -10.0f),
                                                              });
-        } else if (select == "kokiri") {
-            scene.addObject(modelling::Mesh("objs/kokiri.obj"), {
-                                                                    transformation::scale(0.1f).toMat4x4(),
-                                                                    transformation::rotationY(165.0f).toMat4x4(),
-                                                                    transformation::translate(0.0f, -50.0f, -20.0f),
-                                                                });
-        } else if (select == "psyduck") {
-            scene.addObject(modelling::Mesh("objs/psyduck.obj"), {
-                                                                     transformation::scale(0.01f).toMat4x4(),
-                                                                     transformation::translate(0.0f, -2.0f, -10.0f),
-                                                                 });
-        } else if (select == "teapot") {
-            scene.addObject(modelling::Mesh("objs/teapot.obj"), {
-                                                                    transformation::translate(0.0f, -2.0f, -5.0f),
-                                                                });
-        } else {
-            fprintf(stderr, "Unknown scene '%s'. Check available scenes.\n", select.c_str());
-            return 1;
-        }
-    } else {
-        // Default scene is the Utah Teapot
+    } else if (select == "teapot") {
         scene.addObject(modelling::Mesh("objs/teapot.obj"), {
                                                                 transformation::translate(0.0f, -2.0f, -5.0f),
                                                             });
+    } else {
+        fprintf(stderr, "Unknown scene '%s'. Check available scenes.\n", select.c_str());
+        return 1;
     }
-
-    modelling::Camera &camera = scene.getCamera();
-    DisplayX11 display(640, 480);
-    Framebuffer framebuffer(64 * 4, 48 * 4);
-    Rasterizer renderer(framebuffer, scene);
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
